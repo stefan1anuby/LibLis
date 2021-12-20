@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <string>
 //#include "Operatii_liste.h"
 
 using namespace sf;
@@ -20,13 +21,8 @@ class Node;
 
 vector < Element* > Elements;
 vector < Node* > Nodes;
-vector < Drawable* > Drawables;
 
-void deleteFromElements(Element* element) {};
-void deleteFromNodes(Node* node) {};
-void deleteFromDrawable(Drawable* drawable) {};
-
-
+queue < pair < string , string > > customEvents;
 /// optiunea de structura de date aleasa de utilizator
 string optionForDS;
 
@@ -96,9 +92,7 @@ public:
         setCenterCoordinates(position);
         circle.setFillColor(color);
 
-        Elements.push_back(this);
         Nodes.push_back(this);
-        Drawables.push_back(this);
     }
 
     void setPosition(Vector2f point)
@@ -179,6 +173,26 @@ public:
 /// Te folosesti de coada asta pentru a face animatii
 queue < pair < Node*, Vector2f> > requestForAnimation;
 
+void animateNewNode()
+{
+    /// aici creez e animatia pentru creearea fiecarui nod ( width , height si columns trebuiesc modificate
+           /// pentru fiecare structura de date )
+
+    int counter = Nodes.size();
+    int width = 100;
+    int height = 100;
+    int columns = 3;
+
+    //Node* nod = new Node(Vector2f(width, height), 25, to_string(counter), "node" + _id, Color::Red);
+    Node* nod = new Node(Vector2f(width, height), 25, to_string(counter), "node" + counter, Color::Red);
+
+    /// aici calculez unde sa ajunga punctul de sosire la animatia pentru nodul creat la apasarea butonului
+    Vector2f target = Vector2f(width + 100 * (counter % columns), height + 100 * (counter / columns));
+
+    /// apelez pentru animatie
+    requestForAnimation.push({ nod, target });
+}
+
 class Buton : public Element
 {
 private:
@@ -209,7 +223,6 @@ public:
         updateTextPosition();
 
         Elements.push_back(this);
-        Drawables.push_back(this);
     }
 
     // cu asta recalculez pozitia textului din element
@@ -238,67 +251,7 @@ public:
     void onClicked()
     {
         setColor(Color::White);
-        if (_id == "addNodeBtn")
-        {
-
-            /// aici creez e animatia pentru creearea fiecarui nod ( width , height si columns trebuiesc modificate
-            /// pentru fiecare structura de date )
-
-            int counter = Nodes.size();
-            int width = 100;
-            int height = 100;
-            int columns = 3;
-
-
-            Node* nod = new Node(Vector2f(width,height), 25, to_string(counter), "node" + _id, Color::Red);
-
-
-            /// aici calculez unde sa ajunga punctul de sosire la animatia pentru nodul creat la apasarea butonului
-            Vector2f target = Vector2f( width + 100 * (counter % columns), height + 100 * (counter / columns) );
-
-            /// apelez pentru animatie
-            requestForAnimation.push({ nod, target });
-        }
-        else if (_id == "delNodeBtn")
-        {
-            // elimin ultimul nod din vectorul Nodes , dar si din vectorul Drawables
-            /// o sa fac schimbari aici , nu te chinui cu partea asta
-            if (!Drawables.empty() && !Nodes.empty())
-            {
-                auto it = Drawables.begin();
-                while (it != Drawables.end())
-                {
-                    if (*it == Nodes[Nodes.size() - 1])
-                    {
-                        it = Drawables.erase(it);
-                        break;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
-                }
-            }
-
-            Nodes.pop_back();
-        }
-        /// aici se alege optiunea de structura de date din ce buton a fost apasat
-        else if (_id == "sllBtn")
-        {
-            optionForDS = "SLL";
-        }
-        else if (_id == "dllBtn")
-        {
-            optionForDS = "DLL";
-        }
-        else if (_id == "stackBtn")
-        {
-            optionForDS = "S";
-        }
-        else if (_id == "queueBtn")
-        {
-            optionForDS = "D";
-        }
+        customEvents.push({ _id, "click" });
 
         ///opresc timpul ca sa creez efectul de click pe buton ca sa se vada noua culoare
         sleep(milliseconds(40));
@@ -341,6 +294,18 @@ public:
     void toString()
     {
 
+    }
+
+    void makeVisible()
+    {
+        isDisplayed = true;
+        isInteractive = true;
+    }
+
+    void makeInvisible()
+    {
+        isDisplayed = false;
+        isInteractive = false;
     }
 
 };
@@ -406,7 +371,11 @@ void updateScreen(RenderWindow* window)
         {
             window->clear(Color::White);
             /// AICI AR TREBUI DRAWABLE
-            for (auto element : Drawables)
+            for (auto element : Elements)
+            {
+                window->draw(*element);
+            }
+            for (auto element : Nodes)
             {
                 window->draw(*element);
             }
@@ -417,6 +386,50 @@ void updateScreen(RenderWindow* window)
         }
     }
 
+}
+
+void resolveCustomEvents()
+{
+    string id, event;
+    while (!customEvents.empty())
+    {
+        id = customEvents.front().first;
+        event = customEvents.front().second;
+        customEvents.pop();
+        if (id == "addNodeBtn")
+        {
+            if (event == "click")
+            {
+                animateNewNode();
+            }
+        }
+        else if (id == "delNodeBtn")
+        {
+            if (event == "click")
+            {
+                if (!Nodes.empty())
+                {
+                    Nodes.pop_back();
+                }
+            }
+        }
+        else if (id == "sllBtn")
+        {
+            optionForDS = "SLL";
+        }
+        else if (id == "dllBtn")
+        {
+            optionForDS = "DLL";
+        }
+        else if (id == "stackBtn")
+        {
+            optionForDS = "S";
+        }
+        else if (id == "queueBtn")
+        {
+            optionForDS = "D";
+        }
+    }
 }
 
 
@@ -436,25 +449,12 @@ int main()
 
         // de implementat stergere din vectori , sunet si mutat pe visual studio
     Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
-    Buton buton2( { 1200,600 } , { 300,50 }, "Delete node", "delNodeBtn");
-    Buton buton3( {1200,700} , {300,50}, " Clear"  , "clearBtn" );
+    Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
+    Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };
     Buton buton4({ 50,0 }, { 300,50 }, "Singly Linked List", "sllBtn");
     Buton buton5({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
     Buton buton6({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
     Buton buton7({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
-
-
-    // cout<<buton.isInRange({510,510})<<endl;
-    /*
-    Node node2({350,360},80,"2");
-    Node node3({600,650},80,"3");
-    Node node4({700,800},100,"4");
-    // Buton buton({100,120});
-    requestForAnimation.push( { &node, {100,160} } );
-    requestForAnimation.push( { &node2, {500,560} } );
-    requestForAnimation.push( { &node3, {600,160} } );
-    requestForAnimation.push( { &node4, {1000,1060} } );
-    */
 
     Vector2f mousePosition;
     Element* target = nullptr;
@@ -462,6 +462,8 @@ int main()
 
     while (window.isOpen())
     {
+        /// aici rezolv logica interfetei
+        resolveCustomEvents();
         /// prin event se refera la interactiunea cu mouse ul , tastatura etc
         Event event;
         while (window.pollEvent(event))
@@ -471,11 +473,21 @@ int main()
             mousePosition = Vector2f(Mouse::getPosition(window));
             for (auto element : Elements)
             {
-                /// parcurg vectorul de elemente si retin elementul pentru care mouse ul se afla in "range" ul lui
                 if (element->isInRange(mousePosition))
                 {
                     target = element;
                     target->onHover();
+                }
+            }
+            if (target == nullptr)
+            {
+                for (auto element : Nodes)
+                {
+                    if (element->isInRange(mousePosition))
+                    {
+                        target = element;
+                        target->onHover();
+                    }
                 }
             }
 
@@ -517,7 +529,6 @@ int main()
             press = false;
         }
     }
-    //Node::getRandomNode();
     return 0;
 }
 
