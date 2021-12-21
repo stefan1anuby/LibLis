@@ -20,13 +20,14 @@ Clock myClock;
 
 class Element;
 class Node;
+class Buton;
 
 vector < Element* > Elements;
 vector < Node* > Nodes;
 
-unordered_map < string, Element* > ButonDictionar;
+unordered_map < string, Buton* > ButonDictionar;
 
-queue < pair < string , string > > customEvents;
+queue < pair < string, string > > customEvents;
 /// optiunea de structura de date aleasa de utilizator
 string optionForDS;
 
@@ -56,7 +57,7 @@ public:
     virtual void move(Vector2f direction) = 0;
     virtual void draw(RenderTarget& target, RenderStates states) const = 0;
     virtual void onClicked() = 0;
-    virtual bool isInRange(Vector2f point)=0;
+    virtual bool isInRange(Vector2f point) = 0;
     virtual void setColor(Color Color) {};
     virtual void onHover() {};
     virtual void setTexture(Texture* texture) {};
@@ -216,6 +217,10 @@ public:
         _id = id;
         isInteractive = interactive;
         _color = color;
+        if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn") {
+            isDisplayed = false;
+            isInteractive = false;
+        }
 
         rectangle.setSize(size);
         rectangle.setPosition(point);
@@ -422,23 +427,49 @@ void resolveCustomEvents()
         else if (id == "sllBtn")
         {
             optionForDS = "SLL";
-            //ButonDictionar["sllBtn"]->makeInvisible();
+            if (event == "click")
+            {
+                ButonDictionar["addNodeBtn"]->makeVisible();
+                ButonDictionar["delNodeBtn"]->makeVisible();
+                ButonDictionar["pushNodeBtn"]->makeInvisible();
+                ButonDictionar["popNodeBtn"]->makeInvisible();
+            }
         }
         else if (id == "dllBtn")
         {
             optionForDS = "DLL";
+            if (event == "click")
+            {
+                ButonDictionar["addNodeBtn"]->makeVisible();
+                ButonDictionar["delNodeBtn"]->makeVisible();
+                ButonDictionar["pushNodeBtn"]->makeInvisible();
+                ButonDictionar["popNodeBtn"]->makeInvisible();
+            }
         }
         else if (id == "stackBtn")
         {
             optionForDS = "S";
+            if (event == "click")
+            {
+                ButonDictionar["addNodeBtn"]->makeInvisible();
+                ButonDictionar["delNodeBtn"]->makeInvisible();
+                ButonDictionar["pushNodeBtn"]->makeVisible();
+                ButonDictionar["popNodeBtn"]->makeVisible();
+            }
         }
         else if (id == "queueBtn")
         {
             optionForDS = "D";
+            if (event == "click")
+            {
+                ButonDictionar["addNodeBtn"]->makeInvisible();
+                ButonDictionar["delNodeBtn"]->makeInvisible();
+                ButonDictionar["pushNodeBtn"]->makeVisible();
+                ButonDictionar["popNodeBtn"]->makeVisible();
+            }
         }
     }
 }
-
 
 
 int main()
@@ -450,23 +481,28 @@ int main()
     Thread animationsThread(&animations);
     updateScreenThread.launch();
     animationsThread.launch();
-    /*
-    SoundBuffer buffer;
+
+    /*SoundBuffer buffer;
     if (!buffer.loadFromFile("sound.wav"))
         return -1;
     Sound sound;
     sound.setBuffer(buffer);
-    sound.play();
-    */
+    sound.play();*/
 
-        // de implementat stergere din vectori , sunet si mutat pe visual studio
-    Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
-    Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
-    Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };
-    Buton buton4({ 50,0 }, { 300,50 }, "Singly Linked List", "sllBtn");
-    Buton buton5({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
-    Buton buton6({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
-    Buton buton7({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+    // de implementat stergere din vectori , sunet si mutat pe visual studio
+/*Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
+Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
+Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
+    Buton selectorSLL({ 50,0 }, { 300,50 }, "Singly Linked List", "sllBtn");
+    Buton selectorDLL({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
+    Buton selectorStack({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
+    Buton selectorQueue({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+    Buton addNode({ 1200,500 }, { 300,50 }, "Add node", "addNodeBtn");
+    Buton deleteNode({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
+    Buton pushNode({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");
+    Buton popNode({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
+    Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
+
 
     Vector2f mousePosition;
     Element* target = nullptr;
