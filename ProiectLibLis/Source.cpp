@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -449,6 +450,16 @@ int main()
     Thread animationsThread(&animations);
     updateScreenThread.launch();
     animationsThread.launch();
+    /*
+    SoundBuffer buffer;
+    if (!buffer.loadFromFile("sound.wav"))
+        return -1;
+    Sound sound;
+    sound.setBuffer(buffer);
+    sound.play();
+    */
+
+        // de implementat stergere din vectori , sunet si mutat pe visual studio
     Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
     Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
     Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };
@@ -456,13 +467,6 @@ int main()
     Buton buton5({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
     Buton buton6({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
     Buton buton7({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
-
-    //    sf::SoundBuffer buffer;
-    //    if (!buffer.loadFromFile("sound.wav"))
-    //       return -1;
-
-        // de implementat stergere din vectori , sunet si mutat pe visual studio
-   
 
     Vector2f mousePosition;
     Element* target = nullptr;
