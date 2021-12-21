@@ -443,9 +443,12 @@ int main()
     updateScreenThread.launch();
     animationsThread.launch();
 
-    //    sf::SoundBuffer buffer;
-    //    if (!buffer.loadFromFile("sound.wav"))
-    //       return -1;
+    SoundBuffer buffer;
+    if (!buffer.loadFromFile("sound.wav"))
+        return -1;
+    Sound sound;
+    sound.setBuffer(buffer);
+    sound.play();
 
         // de implementat stergere din vectori , sunet si mutat pe visual studio
     Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
