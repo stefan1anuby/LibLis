@@ -49,22 +49,6 @@ public:
 	void pop();
 };
 
-void List::emptyList() {
-	first = NULL;
-	last = NULL;
-	length = 0;
-}
-
-List::List() {
-	emptyList();
-}
-Stack::Stack() {
-	L.emptyList();
-}
-Queue::Queue() {
-	L.emptyList();
-}
-
 
 
 //int main()

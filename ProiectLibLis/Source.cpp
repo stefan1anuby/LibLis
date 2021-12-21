@@ -5,7 +5,7 @@
 #include <queue>
 #include <string>
 #include <unordered_map>
-//#include "Operatii_liste.h"
+#include "Operatii_liste.h"
 
 using namespace sf;
 using namespace std;
@@ -402,12 +402,20 @@ void updateScreen(RenderWindow* window)
 void resolveCustomEvents()
 {
     string id, event;
+    List list;
     while (!customEvents.empty())
     {
         id = customEvents.front().first;
         event = customEvents.front().second;
         customEvents.pop();
-        if (id == "addNodeBtn")
+        if (id == "newListBtn")
+        {
+            if (event == "click")
+            {
+                list.emptyList();
+            }
+        }
+        else if (id == "addNodeBtn")
         {
             if (event == "click")
             {
@@ -429,6 +437,7 @@ void resolveCustomEvents()
             optionForDS = "SLL";
             if (event == "click")
             {
+                ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
@@ -440,6 +449,7 @@ void resolveCustomEvents()
             optionForDS = "DLL";
             if (event == "click")
             {
+                ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
@@ -451,6 +461,7 @@ void resolveCustomEvents()
             optionForDS = "S";
             if (event == "click")
             {
+                ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeInvisible();
                 ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeVisible();
@@ -462,6 +473,7 @@ void resolveCustomEvents()
             optionForDS = "D";
             if (event == "click")
             {
+                ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeInvisible();
                 ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeVisible();
@@ -497,6 +509,7 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton selectorDLL({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
     Buton selectorStack({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
     Buton selectorQueue({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+    Buton newList({ 1200,400 }, { 300,50 }, "New List", "newListBtn");
     Buton addNode({ 1200,500 }, { 300,50 }, "Add node", "addNodeBtn");
     Buton deleteNode({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
     Buton pushNode({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");

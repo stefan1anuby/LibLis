@@ -1,5 +1,21 @@
 #include "Operatii_liste.h";
 
+void List::emptyList() {
+	first = NULL;
+	last = NULL;
+	length = 0;
+}
+
+List::List() {
+	emptyList();
+}
+Stack::Stack() {
+	L.emptyList();
+}
+Queue::Queue() {
+	L.emptyList();
+}
+
 void List::addNode(std::string data, unsigned int node_id) {
 	node* newnode = new node;
 	newnode->data = data;
