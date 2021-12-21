@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include <unordered_map>
 //#include "Operatii_liste.h"
 
 using namespace sf;
@@ -21,6 +22,8 @@ class Node;
 
 vector < Element* > Elements;
 vector < Node* > Nodes;
+
+unordered_map < string, Element* > ButonDictionar;
 
 queue < pair < string , string > > customEvents;
 /// optiunea de structura de date aleasa de utilizator
@@ -56,6 +59,8 @@ public:
     virtual void setColor(Color Color) {};
     virtual void onHover() {};
     virtual void setTexture(Texture* texture) {};
+    virtual void makeVisible() {};
+    virtual void makeInvisible() {};
 
 };
 
@@ -200,7 +205,6 @@ private:
     Text text;
     string info;
     int text_width, text_height;
-    int TEST;
 
 public:
     /// constructorul pentru buton
@@ -223,6 +227,7 @@ public:
         updateTextPosition();
 
         Elements.push_back(this);
+        ButonDictionar[_id] = this;
     }
 
     // cu asta recalculez pozitia textului din element
@@ -416,6 +421,7 @@ void resolveCustomEvents()
         else if (id == "sllBtn")
         {
             optionForDS = "SLL";
+            //ButonDictionar["sllBtn"]->makeInvisible();
         }
         else if (id == "dllBtn")
         {
@@ -433,6 +439,7 @@ void resolveCustomEvents()
 }
 
 
+
 int main()
 {
     font.loadFromFile("./Fonts/Montserrat-Regular.ttf");
@@ -442,12 +449,6 @@ int main()
     Thread animationsThread(&animations);
     updateScreenThread.launch();
     animationsThread.launch();
-
-    //    sf::SoundBuffer buffer;
-    //    if (!buffer.loadFromFile("sound.wav"))
-    //       return -1;
-
-        // de implementat stergere din vectori , sunet si mutat pe visual studio
     Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
     Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
     Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };
@@ -455,6 +456,13 @@ int main()
     Buton buton5({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
     Buton buton6({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
     Buton buton7({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+
+    //    sf::SoundBuffer buffer;
+    //    if (!buffer.loadFromFile("sound.wav"))
+    //       return -1;
+
+        // de implementat stergere din vectori , sunet si mutat pe visual studio
+   
 
     Vector2f mousePosition;
     Element* target = nullptr;
