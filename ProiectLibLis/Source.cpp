@@ -25,6 +25,11 @@ class Buton;
 vector < Element* > Elements;
 vector < Node* > Nodes;
 
+vector < Node* > NodesSLL;
+vector < Node* > NodesDLL;
+vector < Node* > NodesStack;
+vector < Node* > NodesQueue;
+
 unordered_map < string, Buton* > ButonDictionar;
 
 queue < pair < string, string > > customEvents;
@@ -80,7 +85,7 @@ private:
 
 public:
     ///  constructorul pentru nod
-    Node(Vector2f point = { 500,500 }, int radius = 100, string value = "", string id = "", Color color = Color::White, bool interactive = true)
+    Node(Vector2f point = { 500,500 }, int radius = 100, string value = "", string id = "",  string ds_type="sll", Color color = Color::Red , bool interactive = true)
     {
         isInteractive = interactive;
 
@@ -100,6 +105,10 @@ public:
         circle.setFillColor(color);
 
         Nodes.push_back(this);
+        if (ds_type == "sll") NodesSLL.push_back(this);
+        else if (ds_type == "dll") NodesDLL.push_back(this);
+        else if (ds_type == "s") NodesStack.push_back(this);
+        else if (ds_type == "q") NodesQueue.push_back(this);
     }
 
     void setPosition(Vector2f point)
@@ -179,26 +188,6 @@ public:
 // TODO: IN LOC DE NODE TRB TRANSFORMABLE , inainte cand puneam transformable coada nu prelua adresa nodului corect
 /// Te folosesti de coada asta pentru a face animatii
 queue < pair < Node*, Vector2f> > requestForAnimation;
-
-void animateNewNode()
-{
-    /// aici creez e animatia pentru creearea fiecarui nod ( width , height si columns trebuiesc modificate
-           /// pentru fiecare structura de date )
-
-    int counter = Nodes.size();
-    int width = 100;
-    int height = 100;
-    int columns = 3;
-
-    //Node* nod = new Node(Vector2f(width, height), 25, to_string(counter), "node" + _id, Color::Red);
-    Node* nod = new Node(Vector2f(width, height), 25, to_string(counter), "node" + counter, Color::Red);
-
-    /// aici calculez unde sa ajunga punctul de sosire la animatia pentru nodul creat la apasarea butonului
-    Vector2f target = Vector2f(width + 100 * (counter % columns), height + 100 * (counter / columns));
-
-    /// apelez pentru animatie
-    requestForAnimation.push({ nod, target });
-}
 
 class Buton : public Element
 {
@@ -386,7 +375,19 @@ void updateScreen(RenderWindow* window)
             {
                 window->draw(*element);
             }
-            for (auto element : Nodes)
+            for (auto element : NodesSLL)
+            {
+                window->draw(*element);
+            }
+            for (auto element : NodesDLL)
+            {
+                window->draw(*element);
+            }
+            for (auto element : NodesStack)
+            {
+                window->draw(*element);
+            }
+            for (auto element : NodesQueue)
             {
                 window->draw(*element);
             }
@@ -398,6 +399,58 @@ void updateScreen(RenderWindow* window)
     }
 
 }
+
+class DataStructureVisualizer {
+private:
+    vector <Node*> *Vector;
+    Vector2f corner_position;
+    Vector2f nodeSpawn_position;
+    int columns = 3;
+    string ds_type;
+
+    void update()
+    {
+        /// aici recalculam pozitia fiecarui nod , legaturile si o sa facem requestForAnimation.push({ nod, new_target }); pentru fiecare nod parcurgand vectorul cu formula de target cu cateva randuri mai jos
+    }
+public:
+    DataStructureVisualizer(Vector2f corn_pos, int col, vector <Node*>* vec, string type_ds="sll" , Vector2f spawn_pos = { 100,100 })
+    {
+        nodeSpawn_position = spawn_pos;
+        corner_position = corn_pos;
+        Vector = vec;
+        columns = col;
+        ds_type = type_ds;
+    };
+    void pushNode(string val)
+    {
+        int counter = (*Vector).size();
+
+        Node* nod = new Node(nodeSpawn_position, 25, val , "node" + ds_type + val, ds_type);
+        sleep(seconds(0.50));
+        Vector2f target = Vector2f(corner_position.x + 100 * (counter % columns), corner_position.y + 100 * (counter / columns));
+        requestForAnimation.push({ nod, target });
+    }
+    void deleteNode(int counter)
+    {
+        //Nodes.erase(counter);
+        sleep(seconds(1));
+        update();
+    }
+
+    void deleteNode(Node* nod)
+    {
+        //Nodes.erase(nod);
+        sleep(seconds(1));
+        update();
+    }
+
+};
+
+DataStructureVisualizer SLL({100,300},3,&NodesSLL);
+DataStructureVisualizer DLL({ 550,300 }, 1, &NodesDLL , "dll");
+DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
+DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
+
 
 void resolveCustomEvents()
 {
@@ -419,7 +472,17 @@ void resolveCustomEvents()
         {
             if (event == "click")
             {
-                animateNewNode();
+               //animateNewNode();
+                if(optionForDS=="SLL") SLL.pushNode(to_string(NodesSLL.size()));
+                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+            }
+        }
+        else if (id == "pushNodeBtn")
+        {
+            if (event == "click")
+            {
+            if (optionForDS == "S") S.pushNode(to_string(NodesStack.size()));
+            else  if (optionForDS == "Q") Q.pushNode(to_string(NodesQueue.size()));
             }
         }
         else if (id == "delNodeBtn")
@@ -434,9 +497,9 @@ void resolveCustomEvents()
         }
         else if (id == "sllBtn")
         {
-            optionForDS = "SLL";
             if (event == "click")
             {
+                optionForDS = "SLL";
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
@@ -446,9 +509,9 @@ void resolveCustomEvents()
         }
         else if (id == "dllBtn")
         {
-            optionForDS = "DLL";
             if (event == "click")
             {
+                optionForDS = "DLL";
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
@@ -458,9 +521,9 @@ void resolveCustomEvents()
         }
         else if (id == "stackBtn")
         {
-            optionForDS = "S";
             if (event == "click")
             {
+                optionForDS = "S";
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeInvisible();
                 ButonDictionar["delNodeBtn"]->makeInvisible();
@@ -470,9 +533,9 @@ void resolveCustomEvents()
         }
         else if (id == "queueBtn")
         {
-            optionForDS = "D";
             if (event == "click")
             {
+                optionForDS = "Q";
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeInvisible();
                 ButonDictionar["delNodeBtn"]->makeInvisible();
@@ -493,7 +556,6 @@ int main()
     Thread animationsThread(&animations);
     updateScreenThread.launch();
     animationsThread.launch();
-
     /*SoundBuffer buffer;
     if (!buffer.loadFromFile("sound.wav"))
         return -1;
