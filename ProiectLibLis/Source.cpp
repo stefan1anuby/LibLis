@@ -213,7 +213,12 @@ public:
 
         rectangle.setSize(size);
         rectangle.setPosition(point);
-        rectangle.setFillColor(color);
+        if (id.find("ti_") == 0) {
+            rectangle.setFillColor(Color::White);
+            rectangle.setOutlineColor(color);
+        }
+        else
+            rectangle.setFillColor(color);
 
         text.setString(value);
         text.setFont(font);
@@ -505,6 +510,7 @@ void resolveCustomEvents()
                 ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
+                ButonDictionar["ti_addNodePos"]->makeVisible();
             }
         }
         else if (id == "dllBtn")
@@ -577,6 +583,8 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton pushNode({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");
     Buton popNode({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
     Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
+
+    Buton addNodePos({ 1200,500 }, { 300,50 }, "", "ti_addNodePos");
 
 
     Vector2f mousePosition;
