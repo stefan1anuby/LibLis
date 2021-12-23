@@ -51,8 +51,8 @@ protected:
     Color _color;
 
 public:
-    string type;
-    bool isInteractive, isDisplayed = true;
+    string type, ti_text;
+    bool isInteractive, isDisplayed = true, ti_focused;
     CircleShape circle;
     RectangleShape rectangle;
     //   Shape* shape; IN LOC DE CIRCLE SI RECTANGLE SE POATE FOLOSI *shape CA ABSTRACTIZARE
@@ -68,6 +68,7 @@ public:
     virtual void setTexture(Texture* texture) {};
     virtual void makeVisible() {};
     virtual void makeInvisible() {};
+    virtual void handleTextInput(string input) {};
 
 };
 
@@ -202,7 +203,10 @@ public:
     Buton(Vector2f point, Vector2f size = { 50,100 }, string value = "", string id = "", Color color = Color::Blue, bool interactive = true)
     {
         // position=point;
-        type = "Buton";
+        if (id.find("ti_") == 0)
+            type = "TextField";
+        else
+            type = "Buton";
         _id = id;
         isInteractive = interactive;
         _color = color;
@@ -216,6 +220,8 @@ public:
         if (id.find("ti_") == 0) {
             rectangle.setFillColor(Color::White);
             rectangle.setOutlineColor(color);
+            rectangle.setOutlineThickness(1);
+            text.setFillColor(Color::Red);
         }
         else
             rectangle.setFillColor(color);
@@ -228,6 +234,9 @@ public:
 
         Elements.push_back(this);
         ButonDictionar[_id] = this;
+    }
+    void handleTextInput(string input) {
+        text.setString(input);
     }
 
     // cu asta recalculez pozitia textului din element
@@ -255,8 +264,13 @@ public:
     /// metoda ce este chemata automat cand apas pe un buton
     void onClicked()
     {
-        setColor(Color::White);
-        customEvents.push({ _id, "click" });
+        ti_focused = false;
+        if (_id.find("ti_") == 0) {
+            ti_focused = true;
+        }
+        else {
+            setColor(Color::White);
+            customEvents.push({ _id, "click" });
 
         ///opresc timpul ca sa creez efectul de click pe buton ca sa se vada noua culoare
         sleep(milliseconds(40));
@@ -518,7 +532,7 @@ void resolveCustomEvents()
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
-                //ButonDictionar["ti_addNodePos"]->makeVisible();
+                ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
             }
@@ -594,12 +608,13 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton popNode({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
     Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
 
-   // Buton addNodePos({ 1200,500 }, { 300,50 }, "", "ti_addNodePos");
+    Buton addNodePos({ 1200,300 }, { 300,50 }, "", "ti_addNodePos");
 
 
     Vector2f mousePosition;
     Element* target = nullptr;
     bool press = false;
+    string ti_input;
 
     while (window.isOpen())
     {
@@ -663,6 +678,27 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
                     }
                 }
             }
+
+            //if (target->type == "TextField") {
+                if (target != nullptr && target->ti_focused == true) {
+                    if (Event::TextEntered) {
+                        if (event.text.unicode >= 32 && event.text.unicode <= 127) {
+                            ti_input += event.text.unicode;
+                            target->handleTextInput(ti_input);
+                        }
+                    }
+                    if (event.key.code == Keyboard::BackSpace) {
+                        if (!ti_input.empty()) {
+                            ti_input.pop_back();
+                            target->handleTextInput(ti_input);
+                        }
+                    }
+                    if (event.key.code == Keyboard::Return) {
+                        ti_input.clear();
+                        target->handleTextInput(ti_input);
+                    }
+                }
+            //}
         }
         /// cand am eliberat click ul
         if (event.type == Event::MouseButtonReleased)
