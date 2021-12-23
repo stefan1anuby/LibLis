@@ -416,6 +416,13 @@ private:
     void update()
     {
         /// aici recalculam pozitia fiecarui nod , legaturile si o sa facem requestForAnimation.push({ nod, new_target }); pentru fiecare nod parcurgand vectorul cu formula de target cu cateva randuri mai jos
+        int counter = 0;
+        for (auto node : *Vector)
+        {
+            Vector2f target = Vector2f(corner_position.x + 100 * (counter % columns), corner_position.y + 100 * (counter / columns));
+            counter++;
+            requestForAnimation.push({ node, target });
+        }
     }
 public:
     DataStructureVisualizer(Vector2f corn_pos, int col, vector <Node*>* vec, string type_ds="sll" , Vector2f spawn_pos = { 100,100 })
@@ -437,7 +444,7 @@ public:
     }
     void deleteNode(int counter)
     {
-        //Nodes.erase(counter);
+        (*Vector).erase((*Vector).begin()+counter);
         sleep(seconds(1));
         update();
     }
@@ -494,10 +501,13 @@ void resolveCustomEvents()
         {
             if (event == "click")
             {
+                SLL.deleteNode(3);
+                /*
                 if (!Nodes.empty())
                 {
                     Nodes.pop_back();
                 }
+                */
             }
         }
         else if (id == "sllBtn")
@@ -508,9 +518,9 @@ void resolveCustomEvents()
                 ButonDictionar["newListBtn"]->makeVisible();
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
-                ButonDictionar["pushNodeBtn"]->makeInvisible();
+                //ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
-                ButonDictionar["ti_addNodePos"]->makeVisible();
+                ButonDictionar["pushNodeBtn"]->makeInvisible();
             }
         }
         else if (id == "dllBtn")
@@ -584,7 +594,7 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton popNode({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
     Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
 
-    Buton addNodePos({ 1200,500 }, { 300,50 }, "", "ti_addNodePos");
+   // Buton addNodePos({ 1200,500 }, { 300,50 }, "", "ti_addNodePos");
 
 
     Vector2f mousePosition;
