@@ -69,6 +69,7 @@ public:
     virtual void makeVisible() {};
     virtual void makeInvisible() {};
     virtual void handleTextInput(string input) {};
+    const string getText() {};
     virtual void updateTextPosition() {};
 
 };
@@ -88,7 +89,7 @@ private:
 
 public:
     ///  constructorul pentru nod
-    Node(Vector2f point = { 500,500 }, int radius = 100, string value = "", string id = "",  string ds_type="sll", Color color = Color::Red , bool interactive = true)
+    Node(Vector2f point = { 500,500 }, int radius = 100, string value = "", string id = "", string ds_type = "sll", Color color = Color::Red, bool interactive = true)
     {
         isInteractive = interactive;
 
@@ -249,6 +250,9 @@ public:
     void handleTextInput(string input) {
         text.setString(input);
         updateTextPosition();
+    }
+    const string getText() const {
+        return text.getString();
     }
 
     // cu asta recalculez pozitia textului din element
@@ -436,11 +440,12 @@ void updateScreen(RenderWindow* window)
 
 class DataStructureVisualizer {
 private:
-    vector <Node*> *Vector;
+    vector <Node*>* Vector;
     Vector2f corner_position;
     Vector2f nodeSpawn_position;
     int columns = 3;
     string ds_type;
+    List list;
     Time speed = seconds(0.1);
 
     void update()
@@ -455,7 +460,7 @@ private:
         }
     }
 public:
-    DataStructureVisualizer(Vector2f corn_pos, int col, vector <Node*>* vec, string type_ds="sll" , Vector2f spawn_pos = { 100,100 })
+    DataStructureVisualizer(Vector2f corn_pos, int col, vector <Node*>* vec, string type_ds = "sll", Vector2f spawn_pos = { 100,100 })
     {
         nodeSpawn_position = spawn_pos;
         corner_position = corn_pos;
@@ -547,16 +552,15 @@ public:
 
 };
 
-DataStructureVisualizer SLL({100,300},3,&NodesSLL);
-DataStructureVisualizer DLL({ 550,300 }, 1, &NodesDLL , "dll");
-DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
-DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
+DataStructureVisualizer SLL({ 100,300 }, 3, & NodesSLL);
+DataStructureVisualizer DLL({ 550,300 }, 1, & NodesDLL, "dll");
+DataStructureVisualizer S({ 850,300 }, 1, & NodesStack, "s");
+DataStructureVisualizer Q({ 1100,300 }, 1, & NodesQueue, "q");
 
 
-void resolveCustomEvents()
+void resolveCustomEvents(List& list)
 {
     string id, event;
-    List list;
     while (!customEvents.empty())
     {
         id = customEvents.front().first;
@@ -573,9 +577,13 @@ void resolveCustomEvents()
         {
             if (event == "click")
             {
-               //animateNewNode();
+                //animateNewNode();
                 if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
-                //else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+                list.addNode(ButonDictionar["ti_addNodeData"]->getText(), stoi(ButonDictionar["ti_addNodePos"]->getText()));
+                list.printList();
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
             }
         }
         else if (id == "pushNodeBtn")
@@ -609,6 +617,7 @@ void resolveCustomEvents()
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["ti_addNodePos"]->makeVisible();
+                ButonDictionar["ti_addNodeData"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
             }
@@ -685,17 +694,19 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
 
     Buton addNodePos({ 1200,300 }, { 300,50 }, "", "ti_addNodePos");
+    Buton addNodedata({ 1200,200 }, { 300,50 }, "", "ti_addNodeData");
 
 
     Vector2f mousePosition;
     Element* target = nullptr;
     bool press = false;
     string ti_input;
+    List list;
 
     while (window.isOpen())
     {
         /// aici rezolv logica interfetei
-        resolveCustomEvents();
+        resolveCustomEvents(list);
         /// prin event se refera la interactiunea cu mouse ul , tastatura etc
         Event event;
         while (window.pollEvent(event))
@@ -754,27 +765,29 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
                     }
                 }
             }
-
             //if (target->type == "TextField") {
-                if (target != nullptr && target->ti_focused == true) {
-                   // target->updateTextPosition();
-                    if (Event::TextEntered) {
-                        if (event.text.unicode >= 32 && event.text.unicode <= 127) {
-                            ti_input += event.text.unicode;
-                            target->handleTextInput(ti_input);
-                        }
-                    }
-                    if (event.key.code == Keyboard::BackSpace) {
-                        if (!ti_input.empty()) {
-                            ti_input.pop_back();
-                            target->handleTextInput(ti_input);
-                        }
-                    }
-                    if (event.key.code == Keyboard::Return) {
-                        ti_input.clear();
+            if (target != nullptr && target->ti_focused == true) {
+                
+                // target->updateTextPosition();
+                if (event.type == Event::TextEntered) {
+                    if (event.text.unicode >= 32 && event.text.unicode <= 127) {
+                        ti_input += event.text.unicode;
                         target->handleTextInput(ti_input);
                     }
                 }
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::BackSpace) {
+                    if (!ti_input.empty()) {
+                        ti_input.pop_back();
+                        target->handleTextInput(ti_input);
+                    }
+                }
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::Return) {
+                    ti_input.clear();
+                    target->handleTextInput(ti_input);
+                }
+            }
+            if (target == nullptr || target->ti_focused == false)
+                ti_input.clear();
             //}
         }
         /// cand am eliberat click ul
@@ -785,4 +798,3 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     }
     return 0;
 }
-
