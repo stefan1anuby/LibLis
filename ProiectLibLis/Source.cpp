@@ -69,6 +69,7 @@ public:
     virtual void makeVisible() {};
     virtual void makeInvisible() {};
     virtual void handleTextInput(string input) {};
+    virtual void updateTextPosition() {};
 
 };
 
@@ -76,12 +77,13 @@ class Node : public Element
 {
 private:
     Text text;
+    Text below_text;
     string info;
-    int text_width, text_height;
 
     void updateTextPosition()
     {
-        text.setPosition({ position.x - (text_width / 2) - 0, position.y - (text_height / 2) - 10 });
+        text.setPosition({ position.x - (text.getLocalBounds().width / 2) - 0, position.y - (text.getLocalBounds().height / 2) - 10 });
+        below_text.setPosition({ position.x - (below_text.getLocalBounds().width / 2) - 0, position.y - (below_text.getLocalBounds().height / 2) + 30 });
     }
 
 public:
@@ -97,8 +99,9 @@ public:
 
         text.setString(value);
         text.setFont(font);
-        text_width = text.getLocalBounds().width;
-        text_height = text.getLocalBounds().height;
+        
+        below_text.setFillColor(Color::Black);
+
         updateTextPosition();
 
         circle.setRadius(radius);
@@ -106,10 +109,12 @@ public:
         circle.setFillColor(color);
 
         Nodes.push_back(this);
+        /*
         if (ds_type == "sll") NodesSLL.push_back(this);
         else if (ds_type == "dll") NodesDLL.push_back(this);
         else if (ds_type == "s") NodesStack.push_back(this);
         else if (ds_type == "q") NodesQueue.push_back(this);
+        */
     }
 
     void setPosition(Vector2f point)
@@ -154,6 +159,7 @@ public:
         {
             target.draw(circle, states);
             target.draw(text, states);
+            target.draw(below_text, states);
         }
     }
 
@@ -175,14 +181,19 @@ public:
         setPosition(position + direction);
     }
 
-    void toString()
-    {
-        cout << text.getPosition().x << " " << text.getPosition().y << " " << text_width << " " << text_height << endl;
-    }
-
     static Node getNewNode()
     {
         //return new Node();
+    }
+    void setTextBelow(string str)
+    {
+        below_text.setString(str);
+        below_text.setFont(font);
+        updateTextPosition();
+    }
+    void setTextBelowColor(Color color)
+    {
+        below_text.setFillColor(color);
     }
 };
 
@@ -237,11 +248,14 @@ public:
     }
     void handleTextInput(string input) {
         text.setString(input);
+        updateTextPosition();
     }
 
     // cu asta recalculez pozitia textului din element
     void updateTextPosition()
     {
+        text_width = text.getLocalBounds().width;
+        text_height = text.getLocalBounds().height;
         float padding_left = (rectangle.getSize().x - text_width) / 2;
         float padding_top = (rectangle.getSize().y - text_height) / 2;
         text.setPosition(rectangle.getPosition() + Vector2f({ padding_left,padding_top }) + Vector2f({ -3,-6 }));
@@ -272,11 +286,12 @@ public:
             setColor(Color::White);
             customEvents.push({ _id, "click" });
 
-        ///opresc timpul ca sa creez efectul de click pe buton ca sa se vada noua culoare
-        sleep(milliseconds(40));
+            ///opresc timpul ca sa creez efectul de click pe buton ca sa se vada noua culoare
+            sleep(milliseconds(40));
 
-        /// pun culoarea inapoi dupa trecerea timpului
-        setColor(_color);
+            /// pun culoarea inapoi dupa trecerea timpului
+            setColor(_color);
+        }
     }
 
     /// functie asta decide daca punctul primit ca parametru este pe element ( punctul e folosit ca mouse cel mai probabil )
@@ -426,6 +441,7 @@ private:
     Vector2f nodeSpawn_position;
     int columns = 3;
     string ds_type;
+    Time speed = seconds(0.1);
 
     void update()
     {
@@ -447,26 +463,85 @@ public:
         columns = col;
         ds_type = type_ds;
     };
-    void pushNode(string val)
+    void pushNode(string val , int position)
+    {
+        //int counter = (*Vector).size();
+        Node* nod = new Node(nodeSpawn_position, 25, val , "node" + ds_type + val, ds_type);
+        (*Vector).insert((*Vector).begin() + position,nod);
+        sleep(speed);
+        update();
+    }
+    void pushBack(string val)
     {
         int counter = (*Vector).size();
-
-        Node* nod = new Node(nodeSpawn_position, 25, val , "node" + ds_type + val, ds_type);
-        sleep(seconds(0.50));
-        Vector2f target = Vector2f(corner_position.x + 100 * (counter % columns), corner_position.y + 100 * (counter / columns));
-        requestForAnimation.push({ nod, target });
+        Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
+        (*Vector).insert((*Vector).begin() + counter, nod);
+        sleep(speed);
+        update();
     }
+    void pushFront(string val)
+    {
+        Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
+        (*Vector).insert((*Vector).begin() , nod);
+        sleep(speed);
+        update();
+    }
+
+    void popBack()
+    {
+        (*Vector).back()->setColor(Color::Green);
+        (*Vector).back()->setTextBelow("back");
+        sleep(speed);
+        (*Vector).back()->setTextBelow("delete");
+        (*Vector).back()->setTextBelowColor(Color::Red);
+        sleep(speed);
+        (*Vector).pop_back();
+        update();
+    }
+
+    void popFront()
+    {
+        (*Vector).front()->setColor(Color::Green);
+        (*Vector).front()->setTextBelow("front");
+        sleep(speed);
+        (*Vector).front()->setTextBelow("delete");
+        (*Vector).front()->setTextBelowColor(Color::Red);
+        sleep(speed);
+        (*Vector).erase((*Vector).begin());
+        update();
+    }
+
     void deleteNode(int counter)
     {
+        for(int i=0 ; i <= counter ; i++)
+        {
+            (*Vector)[i]->setColor(Color::Blue);
+            (*Vector)[i]->setTextBelow("iter");
+            sleep(speed);
+            if (i < counter) 
+            { 
+                (*Vector)[i]->setTextBelow("index < " +to_string(counter));
+                sleep(speed);
+                (*Vector)[i]->setTextBelow("iter = iter -> next");
+                sleep(speed); 
+            }
+            (*Vector)[i]->setColor(Color::Red);
+            (*Vector)[i]->setTextBelow("");
+        }
+        (*Vector)[counter]->setTextBelow("index == " + to_string(counter));
+        sleep(speed);
+        (*Vector)[counter]->setTextBelow("delete");
+        (*Vector)[counter]->setColor(Color::Green);
+        (*Vector)[counter]->setTextBelowColor(Color::Blue);
+        sleep(speed);
         (*Vector).erase((*Vector).begin()+counter);
-        sleep(seconds(1));
         update();
     }
 
     void deleteNode(Node* nod)
     {
         //Nodes.erase(nod);
-        sleep(seconds(1));
+        sleep(speed);
         update();
     }
 
@@ -499,23 +574,24 @@ void resolveCustomEvents()
             if (event == "click")
             {
                //animateNewNode();
-                if(optionForDS=="SLL") SLL.pushNode(to_string(NodesSLL.size()));
-                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+                if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
+                //else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
             }
         }
         else if (id == "pushNodeBtn")
         {
             if (event == "click")
             {
-            if (optionForDS == "S") S.pushNode(to_string(NodesStack.size()));
-            else  if (optionForDS == "Q") Q.pushNode(to_string(NodesQueue.size()));
+           // if (optionForDS == "S") S.pushNode(to_string(NodesStack.size()));
+           // else  if (optionForDS == "Q") Q.pushNode(to_string(NodesQueue.size()));
             }
         }
         else if (id == "delNodeBtn")
         {
             if (event == "click")
             {
-                SLL.deleteNode(3);
+                if (optionForDS == "SLL") SLL.deleteNode(4);
+                else if (optionForDS == "DLL") DLL.deleteNode(4);
                 /*
                 if (!Nodes.empty())
                 {
@@ -681,6 +757,7 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
 
             //if (target->type == "TextField") {
                 if (target != nullptr && target->ti_focused == true) {
+                   // target->updateTextPosition();
                     if (Event::TextEntered) {
                         if (event.text.unicode >= 32 && event.text.unicode <= 127) {
                             ti_input += event.text.unicode;
