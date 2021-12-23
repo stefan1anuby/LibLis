@@ -69,6 +69,7 @@ public:
     virtual void makeVisible() {};
     virtual void makeInvisible() {};
     virtual void handleTextInput(string input) {};
+    const string getText() {};
     virtual void updateTextPosition() {};
 
 };
@@ -239,6 +240,9 @@ public:
     void handleTextInput(string input) {
         text.setString(input);
         updateTextPosition();
+    }
+    const string getText() const {
+        return text.getString();
     }
 
     // cu asta recalculez pozitia textului din element
@@ -431,6 +435,7 @@ private:
     Vector2f nodeSpawn_position;
     int columns = 3;
     string ds_type;
+    List list;
 
     void update()
     {
@@ -483,10 +488,9 @@ DataStructureVisualizer S({ 850,300 }, 1, & NodesStack, "s");
 DataStructureVisualizer Q({ 1100,300 }, 1, & NodesQueue, "q");
 
 
-void resolveCustomEvents()
+void resolveCustomEvents(List& list)
 {
     string id, event;
-    List list;
     while (!customEvents.empty())
     {
         id = customEvents.front().first;
@@ -506,6 +510,10 @@ void resolveCustomEvents()
                 //animateNewNode();
                 if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()));
                 else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+                list.addNode(ButonDictionar["ti_addNodeData"]->getText(), stoi(ButonDictionar["ti_addNodePos"]->getText()));
+                list.printList();
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
             }
         }
         else if (id == "pushNodeBtn")
@@ -622,11 +630,12 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Element* target = nullptr;
     bool press = false;
     string ti_input;
+    List list;
 
     while (window.isOpen())
     {
         /// aici rezolv logica interfetei
-        resolveCustomEvents();
+        resolveCustomEvents(list);
         /// prin event se refera la interactiunea cu mouse ul , tastatura etc
         Event event;
         while (window.pollEvent(event))
@@ -685,9 +694,9 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
                     }
                 }
             }
-
             //if (target->type == "TextField") {
             if (target != nullptr && target->ti_focused == true) {
+                
                 // target->updateTextPosition();
                 if (event.type == Event::TextEntered) {
                     if (event.text.unicode >= 32 && event.text.unicode <= 127) {
@@ -695,17 +704,19 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
                         target->handleTextInput(ti_input);
                     }
                 }
-                if (event.key.code == Keyboard::BackSpace) {
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::BackSpace) {
                     if (!ti_input.empty()) {
                         ti_input.pop_back();
                         target->handleTextInput(ti_input);
                     }
                 }
-                if (event.key.code == Keyboard::Return) {
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::Return) {
                     ti_input.clear();
                     target->handleTextInput(ti_input);
                 }
             }
+            if (target == nullptr || target->ti_focused == false)
+                ti_input.clear();
             //}
         }
         /// cand am eliberat click ul
