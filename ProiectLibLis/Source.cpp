@@ -538,6 +538,7 @@ void resolveCustomEvents()
                 ButonDictionar["addNodeBtn"]->makeVisible();
                 ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["ti_addNodePos"]->makeVisible();
+                ButonDictionar["ti_addNodeData"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
             }
@@ -614,6 +615,7 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
     Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
 
     Buton addNodePos({ 1200,300 }, { 300,50 }, "", "ti_addNodePos");
+    Buton addNodedata({ 1200,200 }, { 300,50 }, "", "ti_addNodeData");
 
 
     Vector2f mousePosition;
@@ -687,7 +689,7 @@ Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
             //if (target->type == "TextField") {
             if (target != nullptr && target->ti_focused == true) {
                 // target->updateTextPosition();
-                if (Event::TextEntered) {
+                if (event.type == Event::TextEntered) {
                     if (event.text.unicode >= 32 && event.text.unicode <= 127) {
                         ti_input += event.text.unicode;
                         target->handleTextInput(ti_input);
