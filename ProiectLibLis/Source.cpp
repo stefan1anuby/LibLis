@@ -42,6 +42,15 @@ int DistanceBetweenTwoPointsSquared(Vector2f point1, Vector2f point2)
     return (point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y);
 }
 
+bool isPositiveNumber(const string& s)
+{
+    for (char const& ch : s) {
+        if (isdigit(ch) == 0)
+            return false;
+    }
+    return true;
+}
+
 class Element : public Drawable, public Transformable
 {
 protected:
@@ -222,11 +231,12 @@ public:
         _id = id;
         isInteractive = interactive;
         _color = color;
+        
         if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn") {
-            isDisplayed = false;
-            isInteractive = false;
+            makeInvisible();
         }
-
+        
+        
         rectangle.setSize(size);
         rectangle.setPosition(point);
         if (id.find("ti_") == 0) {
@@ -245,10 +255,13 @@ public:
         updateTextPosition();
 
         Elements.push_back(this);
-        ButonDictionar[_id] = this;
+        //ButonDictionar[_id] = this;
     }
     void handleTextInput(string input) {
+        string str = text.getString();
         text.setString(input);
+        if (rectangle.getSize().x < text.getLocalBounds().width + 10)
+            handleTextInput(str);
         updateTextPosition();
     }
     const string getText() const {
@@ -263,6 +276,12 @@ public:
         float padding_left = (rectangle.getSize().x - text_width) / 2;
         float padding_top = (rectangle.getSize().y - text_height) / 2;
         text.setPosition(rectangle.getPosition() + Vector2f({ padding_left,padding_top }) + Vector2f({ -3,-6 }));
+    }
+
+    void setText(string str)
+    {
+        text.setString(str);
+        updateTextPosition();
     }
 
     void setTexture(Texture* texture)
@@ -478,7 +497,6 @@ void updateScreen(RenderWindow* window)
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
             window->clear(Color::White);
-            /*window->draw(Line({ 100, 50 }, { 200, 90 }));*/
             /// AICI AR TREBUI DRAWABLE
             for (auto element : Elements)
             {
@@ -524,7 +542,7 @@ private:
     int columns = 3;
     string ds_type;
     List list;
-    Time speed = seconds(0.1);
+    Time speed = seconds(0.5);
 
     void update()
     {
@@ -628,12 +646,24 @@ public:
         update();
     }
 
+    void erase()
+    {
+        for (auto node : (*Vector))
+        {
+            requestForAnimation.push({ node,{-100,1500} });
+        }
+        // nu stiu de ce nu merge *
+        sleep(speed);
+        (*Vector).clear();
+
+    }
+
 };
 
-DataStructureVisualizer SLL({ 100,300 }, 3, & NodesSLL);
-DataStructureVisualizer DLL({ 550,300 }, 1, & NodesDLL, "dll");
-DataStructureVisualizer S({ 850,300 }, 1, & NodesStack, "s");
-DataStructureVisualizer Q({ 1100,300 }, 1, & NodesQueue, "q");
+DataStructureVisualizer SLL({ 100,300 }, 3, &NodesSLL);
+DataStructureVisualizer DLL({ 550,300 }, 1, &NodesDLL, "dll");
+DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
+DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
 
 float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2) {
     return sqrtf(powf((point2.x - point1.x), 2) + powf((point2.y - point1.y), 2));
@@ -649,7 +679,7 @@ void DrawLine(Vector2f pos1, Vector2f pos2) {
     rectangle.setFillColor(Color::Red);
 }
 
-void resolveCustomEvents(List& list)
+void resolveCustomEvents()
 {
     string id, event;
     while (!customEvents.empty())
@@ -661,7 +691,7 @@ void resolveCustomEvents(List& list)
         {
             if (event == "click")
             {
-                list.emptyList();
+                if (optionForDS == "SLL") SLL.erase();
             }
         }
         else if (id == "addNodeBtn")
@@ -669,12 +699,36 @@ void resolveCustomEvents(List& list)
             if (event == "click")
             {
                 //animateNewNode();
-                if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
-                //else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
-                list.addNode(ButonDictionar["ti_addNodeData"]->getText(), stoi(ButonDictionar["ti_addNodePos"]->getText()));
-                list.printList();
+                string val, pos;
+                val = ButonDictionar["ti_addNodeData"]->getText();
+                pos = ButonDictionar["ti_addNodePos"]->getText();
+                if (optionForDS == "SLL")
+                {
+
+                    if (isPositiveNumber(pos) && val != "Value") {
+                        SLL.pushNode(val, stoi(pos));
+                    }
+                    else if (val != "Value")
+                    {
+                        SLL.pushBack(val);
+
+                    }
+                    else if (isPositiveNumber(pos))
+                    {
+                        SLL.pushNode(to_string(NodesSLL.size()),stoi(pos));
+                    }
+                    else
+                    {
+                        SLL.pushBack(to_string(NodesSLL.size()));
+                    }
+                }
+                //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
+                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText("Value");
+                ButonDictionar["ti_addNodePos"]->setText("Position");
+
             }
         }
         else if (id == "pushNodeBtn")
@@ -689,14 +743,25 @@ void resolveCustomEvents(List& list)
         {
             if (event == "click")
             {
-                if (optionForDS == "SLL") SLL.deleteNode(4);
-                else if (optionForDS == "DLL") DLL.deleteNode(4);
-                /*
-                if (!Nodes.empty())
+                string val, pos;
+                val = ButonDictionar["ti_addNodeData"]->getText();
+                pos = ButonDictionar["ti_addNodePos"]->getText();
+
+                if (optionForDS == "SLL")
                 {
-                    Nodes.pop_back();
+                    if (isPositiveNumber(pos)) {
+                        SLL.deleteNode(stoi(pos));
+                    }
+                    else
+                    {
+                        SLL.popBack();
+                    }
                 }
-                */
+                else if (optionForDS == "DLL") DLL.deleteNode(4);
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText("Value");
+                ButonDictionar["ti_addNodePos"]->setText("Position");
             }
         }
         else if (id == "sllBtn")
@@ -711,6 +776,10 @@ void resolveCustomEvents(List& list)
                 ButonDictionar["ti_addNodeData"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
+
+
+
+
             }
         }
         else if (id == "dllBtn")
@@ -769,35 +838,35 @@ int main()
     sound.setBuffer(buffer);
     sound.play();*/
 
-    // de implementat stergere din vectori , sunet si mutat pe visual studio
-/*Buton buton({ 1200,500 }, { 300,50 }, "Push node", "addNodeBtn");
-Buton buton2({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
-Buton buton3{ {1200,700},{300,50},"Clear","clearBtn" };*/
-    Buton selectorSLL({ 50,0 }, { 300,50 }, "Singly Linked List", "sllBtn");
-    Buton selectorDLL({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
-    Buton selectorStack({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
-    Buton selectorQueue({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
-    Buton newList({ 1200,400 }, { 300,50 }, "New List", "newListBtn");
-    Buton addNode({ 1200,500 }, { 300,50 }, "Add node", "addNodeBtn");
-    Buton deleteNode({ 1200,600 }, { 300,50 }, "Delete node", "delNodeBtn");
-    Buton pushNode({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");
-    Buton popNode({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
-    Buton clearList{ {1200,700},{300,50},"Clear List","clearListBtn" };
 
-    Buton addNodePos({ 1200,300 }, { 300,50 }, "", "ti_addNodePos");
-    Buton addNodedata({ 1200,200 }, { 300,50 }, "", "ti_addNodeData");
+    /// IN LOC SA CREEZ VARIABILE MAI BINE LE PUN IN DICTIONAR DIRECT
+    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, "Singly Linked List", "sllBtn");
+    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
+    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
+    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 300,50 }, "New List", "newListBtn");
+    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, "Add", "addNodeBtn");
+    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 150,50 }, "Delete", "delNodeBtn");
+    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");
+    ButonDictionar["popNodeBtn"] = new Buton({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
+    ButonDictionar["clearListBtn"] = new Buton( {1200,700},{300,50},"Clear List","clearListBtn" );
+
+    ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, "Position", "ti_addNodePos");
+    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 150,50 }, "Value", "ti_addNodeData");
 
 
+
+    //ButonDictionar["test"] = new Buton({ 500,500 }, { 300,50 }, "test", "test");
+    
     Vector2f mousePosition;
     Element* target = nullptr;
     bool press = false;
     string ti_input;
-    List list;
 
     while (window.isOpen())
     {
         /// aici rezolv logica interfetei
-        resolveCustomEvents(list);
+        resolveCustomEvents();
         /// prin event se refera la interactiunea cu mouse ul , tastatura etc
         Event event;
         while (window.pollEvent(event))
