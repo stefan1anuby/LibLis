@@ -397,17 +397,88 @@ void animations()
     }
 }
 
+float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2);
 /// functie ce este apelata automat ce da refresh la ecran
 void updateScreen(RenderWindow* window)
 {
     Context context;
     Time time_interval = milliseconds(FRAME_INTERVAL);
     Time timeSnapshot = milliseconds(0);
+
+    Texture texture;
+    if (!texture.loadFromFile("./Images/arrow.png"))
+        return;
+    Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setScale(0.2, 0.2);
+
+    RectangleShape rectangle;
+    ConvexShape triangle;
+    CircleShape circle1, circle2, circle3;
+    //Vector2f pos1(500, 450);
+    //Vector2f pos2(550, 550);
+    Vector2f pos1(632, 344);
+    Vector2f pos2(376, 123);
+    //cout << distanceBetweenTwoPoints(pos1, pos2);
+    Vector2f pos3(pos2.x, pos1.y);
+    float angle = asin(distanceBetweenTwoPoints(pos2, pos3) / distanceBetweenTwoPoints(pos1, pos2)) * (180.0 / 3.141592653589793238463);
+    //cout << "\n" << angle;
+    rectangle.setSize({distanceBetweenTwoPoints(pos1, pos2), 2 });
+    //rectangle.setSize({ 107.703, 5 });
+    if (pos1.x < pos2.x) {
+        if (pos1.y < pos2.y) {
+            rectangle.setRotation(angle);
+            sprite.setRotation(angle);
+        }
+        if (pos1.y > pos2.y) {
+            rectangle.setRotation(360-angle);
+            sprite.setRotation(360 - angle);
+        }
+    }
+    if (pos1.x > pos2.x) {
+        if (pos1.y < pos2.y) {
+            rectangle.setRotation(180-angle);
+            sprite.setRotation(180 - angle);
+        }
+        if (pos1.y > pos2.y) {
+            rectangle.setRotation(180+angle);
+            sprite.setRotation(180 + angle);
+        }
+    }
+
+        
+    //rectangle.setRotation(40.f);
+    rectangle.setPosition(pos1);
+    rectangle.setFillColor(Color::Red);
+    /*triangle.setFillColor(Color::Red);
+
+    triangle.setPointCount(3);
+    triangle.setPoint(0, pos1);
+    triangle.setPoint(1, pos2);
+    triangle.setPoint(2, pos3);*/
+
+    sprite.setOrigin(pos2);
+    sprite.setPosition(pos2);
+
+    circle1.setRadius(10.f);
+    circle1.setFillColor(Color::Blue);
+    circle1.setPosition(pos1);
+    circle1.setOrigin(10.f, 10.f);
+    circle2.setRadius(10.f);
+    circle2.setFillColor(Color::Cyan);
+    circle2.setPosition(pos2);
+    circle2.setOrigin(10.f, 10.f);
+    circle3.setRadius(10.f);
+    circle3.setFillColor(Color::Green);
+    circle3.setPosition(pos3);
+    circle3.setOrigin(10.f, 10.f);
+
     while (window->isOpen())
     {
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
             window->clear(Color::White);
+            /*window->draw(Line({ 100, 50 }, { 200, 90 }));*/
             /// AICI AR TREBUI DRAWABLE
             for (auto element : Elements)
             {
@@ -429,6 +500,13 @@ void updateScreen(RenderWindow* window)
             {
                 window->draw(*element);
             }
+
+            window->draw(rectangle);
+            window->draw(circle1);
+            window->draw(circle2);
+            window->draw(circle3);
+            window->draw(sprite);
+            //window->draw(triangle);
 
             window->display();
             timeSnapshot = myClock.getElapsedTime();
@@ -557,6 +635,19 @@ DataStructureVisualizer DLL({ 550,300 }, 1, & NodesDLL, "dll");
 DataStructureVisualizer S({ 850,300 }, 1, & NodesStack, "s");
 DataStructureVisualizer Q({ 1100,300 }, 1, & NodesQueue, "q");
 
+float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2) {
+    return sqrtf(powf((point2.x - point1.x), 2) + powf((point2.y - point1.y), 2));
+}
+
+void DrawLine(Vector2f pos1, Vector2f pos2) {
+    RectangleShape rectangle;
+    Vector2f pos3(pos1.x, pos2.y);
+    float angle = asin(distanceBetweenTwoPoints(pos2, pos3));
+    rectangle.setSize(Vector2f(distanceBetweenTwoPoints(pos1, pos2), 10));
+    rectangle.setRotation(angle);
+    rectangle.setPosition(pos1);
+    rectangle.setFillColor(Color::Red);
+}
 
 void resolveCustomEvents(List& list)
 {
@@ -579,7 +670,7 @@ void resolveCustomEvents(List& list)
             {
                 //animateNewNode();
                 if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
-                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
+                //else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()));
                 list.addNode(ButonDictionar["ti_addNodeData"]->getText(), stoi(ButonDictionar["ti_addNodePos"]->getText()));
                 list.printList();
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
