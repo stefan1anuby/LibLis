@@ -51,6 +51,74 @@ bool isPositiveNumber(const string& s)
     return true;
 }
 
+float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2) {
+    return sqrtf(powf((point2.x - point1.x), 2) + powf((point2.y - point1.y), 2));
+}
+
+Vector2f multiplyVector2f(Vector2f a, Vector2f b)
+{
+    return Vector2f(a.x * b.x, a.y * b.y);
+}
+Vector2f divideVector2f(Vector2f a, Vector2f b)
+{
+    return Vector2f(a.x / b.x, a.y / b.y);
+}
+
+/// sageata cu partea ascutita spre p2
+ConvexShape getArrow(Vector2f p1, Vector2f p2 , string part = "line" , Vector2f width = { 4,4 } , Vector2f varf_percent = Vector2f(10, 10) , Vector2f padding = { 5,5 })
+{
+    ConvexShape convex;
+    convex.setPointCount(4);
+    /*
+    Vector2f p1 = Vector2f(500, 400);
+    Vector2f p2 = Vector2f(500, 300);
+    */
+
+    Vector2f right = Vector2f(1, -1);
+    Vector2f left = Vector2f(-1, 1);
+    Vector2f dif = (p2 - p1);
+    Vector2f step = divideVector2f(dif, { 100,100 });
+    Vector2f perp_step1 = multiplyVector2f({ step.y, step.x }, right);
+    //Vector2f varf_percent = Vector2f(10, 10);
+    Vector2f varf_ascutit = Vector2f(20, 20);
+    Vector2f t1 = multiplyVector2f(perp_step1, varf_percent) + p2 - multiplyVector2f(step, varf_ascutit);
+    Vector2f perp_step2 = multiplyVector2f({ step.y, step.x }, left);
+    Vector2f t2 = multiplyVector2f(perp_step2, varf_percent) + p2 - multiplyVector2f(step, varf_ascutit);
+    Vector2f almost_p2 = p1 + multiplyVector2f(step, Vector2f{ 100,100 } - varf_ascutit );
+    Vector2f almost_p2_t1 = almost_p2 + perp_step1;
+    Vector2f almost_p2_t2 = almost_p2 + perp_step2;
+
+
+    convex.setPoint(0, almost_p2);
+    convex.setPoint(1, t1);
+    convex.setPoint(2, p2);
+    convex.setPoint(3, t2);
+    convex.setFillColor(Color::Black);
+
+    /// partea ascutita
+    if (part == "sharp") return convex;
+
+    ConvexShape convex2;
+    convex2.setPointCount(4);
+    convex2.setPoint(0, p1 + multiplyVector2f(perp_step1, width) + multiplyVector2f(step, padding));
+    convex2.setPoint(3, p2 + multiplyVector2f(perp_step1, width) - multiplyVector2f(step, padding));
+    convex2.setPoint(1, p1 + multiplyVector2f(perp_step2, width) + multiplyVector2f(step, padding));
+    convex2.setPoint(2, p2 + multiplyVector2f(perp_step2, width) - multiplyVector2f(step, padding));
+    /*
+
+    convex2.setPoint(0, p1 + multiplyVector2f(right, width) + multiplyVector2f(step, padding));
+    convex2.setPoint(3, p2 + multiplyVector2f(right, width) - multiplyVector2f(step, padding));
+    convex2.setPoint(1, p1 + multiplyVector2f(left, width) + multiplyVector2f(step, padding));
+    convex2.setPoint(2, p2 + multiplyVector2f(left, width) - multiplyVector2f(step, padding));
+    */
+    convex2.setFillColor(Color::Black);
+
+    if (part == "line") return convex2;
+    return convex2;
+}
+
+
+
 class Element : public Drawable, public Transformable
 {
 protected:
@@ -119,6 +187,7 @@ public:
         circle.setFillColor(color);
 
         Nodes.push_back(this);
+        Elements.push_back(this);
         /*
         if (ds_type == "sll") NodesSLL.push_back(this);
         else if (ds_type == "dll") NodesDLL.push_back(this);
@@ -184,10 +253,13 @@ public:
         return position;
     }
 
+    float getRadius()
+    {
+        return circle.getRadius();
+    }
+
     void move(Vector2f direction)
     {
-        //circle.move(direction);
-        //cout<<"APELAT"<<endl;
         setPosition(position + direction);
     }
 
@@ -424,74 +496,6 @@ void updateScreen(RenderWindow* window)
     Time time_interval = milliseconds(FRAME_INTERVAL);
     Time timeSnapshot = milliseconds(0);
 
-    Texture texture;
-    if (!texture.loadFromFile("./Images/arrow.png"))
-        return;
-    Sprite sprite;
-    sprite.setTexture(texture);
-    sprite.setScale(0.2, 0.2);
-
-    RectangleShape rectangle;
-    ConvexShape triangle;
-    CircleShape circle1, circle2, circle3;
-    //Vector2f pos1(500, 450);
-    //Vector2f pos2(550, 550);
-    Vector2f pos1(632, 344);
-    Vector2f pos2(376, 123);
-    //cout << distanceBetweenTwoPoints(pos1, pos2);
-    Vector2f pos3(pos2.x, pos1.y);
-    float angle = asin(distanceBetweenTwoPoints(pos2, pos3) / distanceBetweenTwoPoints(pos1, pos2)) * (180.0 / 3.141592653589793238463);
-    //cout << "\n" << angle;
-    rectangle.setSize({distanceBetweenTwoPoints(pos1, pos2), 2 });
-    //rectangle.setSize({ 107.703, 5 });
-    if (pos1.x < pos2.x) {
-        if (pos1.y < pos2.y) {
-            rectangle.setRotation(angle);
-            sprite.setRotation(angle);
-        }
-        if (pos1.y > pos2.y) {
-            rectangle.setRotation(360-angle);
-            sprite.setRotation(360 - angle);
-        }
-    }
-    if (pos1.x > pos2.x) {
-        if (pos1.y < pos2.y) {
-            rectangle.setRotation(180-angle);
-            sprite.setRotation(180 - angle);
-        }
-        if (pos1.y > pos2.y) {
-            rectangle.setRotation(180+angle);
-            sprite.setRotation(180 + angle);
-        }
-    }
-
-        
-    //rectangle.setRotation(40.f);
-    rectangle.setPosition(pos1);
-    rectangle.setFillColor(Color::Red);
-    /*triangle.setFillColor(Color::Red);
-
-    triangle.setPointCount(3);
-    triangle.setPoint(0, pos1);
-    triangle.setPoint(1, pos2);
-    triangle.setPoint(2, pos3);*/
-
-    sprite.setOrigin(pos2);
-    sprite.setPosition(pos2);
-
-    circle1.setRadius(10.f);
-    circle1.setFillColor(Color::Blue);
-    circle1.setPosition(pos1);
-    circle1.setOrigin(10.f, 10.f);
-    circle2.setRadius(10.f);
-    circle2.setFillColor(Color::Cyan);
-    circle2.setPosition(pos2);
-    circle2.setOrigin(10.f, 10.f);
-    circle3.setRadius(10.f);
-    circle3.setFillColor(Color::Green);
-    circle3.setPosition(pos3);
-    circle3.setOrigin(10.f, 10.f);
-
     while (window->isOpen())
     {
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
@@ -502,29 +506,47 @@ void updateScreen(RenderWindow* window)
             {
                 window->draw(*element);
             }
+
+            Node* last = nullptr;
+            int counter = 0;
             for (auto element : NodesSLL)
             {
-                window->draw(*element);
+                if (last != nullptr) {
+                    Vector2f width = { 2,2 };
+                    Vector2f arrowSize = { 10,10 };
+                    Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
+                    float radius = (*element).getRadius();
+                    Vector2f orientation1 = {radius,0};
+                    Vector2f orientation2 = {-radius,0 };
+                    if (counter % 3 == 0) {
+                        width = { 0.5,0.5 }; 
+                        orientation1 = { -radius ,radius };
+                        orientation2 = { radius ,-radius };
+                        arrowSize = { 5 ,5 };
+                    }
+                    ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2,"line", width);
+                    ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2,"sharp",width,arrowSize);
+                    ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
+                    window->draw(ar);
+                    window->draw(ar2);
+                    window->draw(ar3);
+                }
+                counter++;
+                last = element;
+                //window->draw(*element);
             }
             for (auto element : NodesDLL)
             {
-                window->draw(*element);
+                //window->draw(*element);
             }
             for (auto element : NodesStack)
             {
-                window->draw(*element);
+                //window->draw(*element);
             }
             for (auto element : NodesQueue)
             {
-                window->draw(*element);
+                //window->draw(*element);
             }
-
-            window->draw(rectangle);
-            window->draw(circle1);
-            window->draw(circle2);
-            window->draw(circle3);
-            window->draw(sprite);
-            //window->draw(triangle);
 
             window->display();
             timeSnapshot = myClock.getElapsedTime();
@@ -665,19 +687,6 @@ DataStructureVisualizer DLL({ 550,300 }, 1, &NodesDLL, "dll");
 DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
 DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
 
-float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2) {
-    return sqrtf(powf((point2.x - point1.x), 2) + powf((point2.y - point1.y), 2));
-}
-
-void DrawLine(Vector2f pos1, Vector2f pos2) {
-    RectangleShape rectangle;
-    Vector2f pos3(pos1.x, pos2.y);
-    float angle = asin(distanceBetweenTwoPoints(pos2, pos3));
-    rectangle.setSize(Vector2f(distanceBetweenTwoPoints(pos1, pos2), 10));
-    rectangle.setRotation(angle);
-    rectangle.setPosition(pos1);
-    rectangle.setFillColor(Color::Red);
-}
 
 void resolveCustomEvents()
 {
