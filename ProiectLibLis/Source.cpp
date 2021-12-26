@@ -10,7 +10,7 @@
 using namespace sf;
 using namespace std;
 
-#define FRAME_INTERVAL 15
+#define FRAME_INTERVAL 20
 #define WIDTH_SCREEN 1500
 #define HEIGHT_SCREEN 800
 
@@ -187,7 +187,7 @@ public:
         circle.setFillColor(color);
 
         Nodes.push_back(this);
-        Elements.push_back(this);
+       // Elements.push_back(this);
         /*
         if (ds_type == "sll") NodesSLL.push_back(this);
         else if (ds_type == "dll") NodesDLL.push_back(this);
@@ -279,7 +279,6 @@ public:
     }
 };
 
-// TODO: IN LOC DE NODE TRB TRANSFORMABLE , inainte cand puneam transformable coada nu prelua adresa nodului corect
 /// Te folosesti de coada asta pentru a face animatii
 queue < pair < Node*, Vector2f> > requestForAnimation;
 
@@ -501,53 +500,114 @@ void updateScreen(RenderWindow* window)
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
             window->clear(Color::White);
-            /// AICI AR TREBUI DRAWABLE
-            for (auto element : Elements)
+            
+            try
             {
-                window->draw(*element);
-            }
+                // aici desenez legaturile dintre noduri
+                Node* last = nullptr;
+                int counter = 0;
+                for (auto element : NodesSLL)
+                {
+                    if (last != nullptr) {
+                        Vector2f width = { 1,1 };
+                        Vector2f arrowSize = { 8,8 };
+                        Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
+                        float radius = (*element).getRadius();
+                        Vector2f orientation1 = {radius,0};
+                        Vector2f orientation2 = {-radius,0 };
+                        if (counter % 3 == 0) {
+                            width = { 0.5,0.5 }; 
+                            orientation1 = { -radius ,radius };
+                            orientation2 = { radius ,-radius };
+                            arrowSize = { 5 ,5 };
+                        }
 
-            Node* last = nullptr;
-            int counter = 0;
-            for (auto element : NodesSLL)
-            {
-                if (last != nullptr) {
-                    Vector2f width = { 2,2 };
-                    Vector2f arrowSize = { 10,10 };
-                    Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
-                    float radius = (*element).getRadius();
-                    Vector2f orientation1 = {radius,0};
-                    Vector2f orientation2 = {-radius,0 };
-                    if (counter % 3 == 0) {
-                        width = { 0.5,0.5 }; 
-                        orientation1 = { -radius ,radius };
-                        orientation2 = { radius ,-radius };
-                        arrowSize = { 5 ,5 };
+                        float dist = distanceBetweenTwoPoints(pos1, pos2);
+                        /// de terminat
+                       if (dist < 230.0)
+                        {
+                           ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
+                           ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
+                           //ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
+
+                            window->draw(ar);
+                            window->draw(ar2);
+                           // window->draw(ar3);
+                        }
+                        
                     }
-                    ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2,"line", width);
-                    ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2,"sharp",width,arrowSize);
-                    ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
-                    window->draw(ar);
-                    window->draw(ar2);
-                    window->draw(ar3);
+                    counter++;
+                    last = element;
+                    //window->draw(*element);
                 }
-                counter++;
-                last = element;
-                //window->draw(*element);
-            }
-            for (auto element : NodesDLL)
-            {
-                //window->draw(*element);
-            }
-            for (auto element : NodesStack)
-            {
-                //window->draw(*element);
-            }
-            for (auto element : NodesQueue)
-            {
-                //window->draw(*element);
-            }
+                last = nullptr;
+                counter = 0;
 
+                for (auto element : NodesDLL)
+                {
+                    if (last != nullptr) {
+                        Vector2f width = { 1,1 };
+                        Vector2f arrowSize = { 10,10 };
+                        Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
+                        float radius = (*element).getRadius();
+                        Vector2f orientation1 = { 0,radius };
+                        Vector2f orientation2 = { 0,-radius };
+                        float dist = distanceBetweenTwoPoints(pos1, pos2);
+                        /// de terminat
+                       if( dist < 200.0 )
+                        {
+                            ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
+                            ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
+                            ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
+
+                            window->draw(ar);
+                            window->draw(ar2);
+                            window->draw(ar3);
+                        }
+                    }
+                    counter++;
+                    last = element;
+                    //window->draw(*element);
+                }
+                for (auto element : NodesStack)
+                {
+                    //window->draw(*element);
+                }
+                for (auto element : NodesQueue)
+                {
+                    //window->draw(*element);
+                }
+
+
+                /// aici desenez nodurile
+                for (auto element : NodesSLL)
+                {
+                    window->draw(*element);
+                }
+                for (auto element : NodesDLL)
+                {
+                    window->draw(*element);
+                }
+                for (auto element : NodesStack)
+                {
+                    //window->draw(*element);
+                }
+                for (auto element : NodesQueue)
+                {
+                    //window->draw(*element);
+                }
+
+                /// aici desenez butoanele
+                for (auto element : Elements)
+                {
+                    window->draw(*element);
+                }
+
+            }
+            catch (const std::exception&)
+            {
+
+            }
             window->display();
             timeSnapshot = myClock.getElapsedTime();
             //myClock.restart();
@@ -556,6 +616,7 @@ void updateScreen(RenderWindow* window)
 
 }
 
+/// TODO: DE TERMINAT ASTA
 class DataStructureVisualizer {
 private:
     vector <Node*>* Vector;
