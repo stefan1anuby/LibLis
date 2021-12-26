@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Operatii_liste.h";
 
 void List::emptyList() {
@@ -114,14 +116,60 @@ void Queue::pop() {
 	L.deleteNode(0);
 }
 
-void List::printList() {
+void List::printList(std::string dataType) {
+	FILE* output;
 	node* iterator = first;
+	std::string filePath;
+	char* charfilePath;
 	unsigned int current_node = 0;
+
+	if (dataType == "sll")	filePath = "./sll.txt";
+	if (dataType == "dll")	filePath = "./dll.txt";
+	if (dataType == "s")	filePath = "./stack.txt";
+	if (dataType == "q")	filePath = "./queue.txt";
+	
+	charfilePath = &filePath[0];
+	output = fopen(charfilePath, "w");
+
 	while (iterator != NULL) {
-		std::cout << "[" << current_node << "]" << iterator->data << "\n";
+		//stringSize = iterator->data.length();
+		char* buffer;
+		buffer = &iterator->data[0];
+		fputs(buffer, output);
+		fputs(",", output);
+		//std::cout << "[" << current_node << "]" << iterator->data << "\n";
 		iterator = iterator->next;
 		current_node++;
 	}
+
+	fclose(output);
+}
+
+void readFromFile(std::string dataType) {
+	FILE* input;
+	int read;
+	std::string value, filePath;
+	char* charFilePath;
+	
+	if (dataType == "sll")	filePath = "./sll.txt";
+	if (dataType == "dll")	filePath = "./dll.txt";
+	if (dataType == "s")	filePath = "./stack.txt";
+	if (dataType == "q")	filePath = "./queue.txt";
+
+	charFilePath = &filePath[0];
+	input = fopen(charFilePath, "r");
+
+	if (input == NULL)	{ std::cout << "file does not exist"; return; }
+
+	do {
+		read = fgetc(input);
+		if (read != ',') value += read;
+		else {
+			std::cout << value << "\n";
+			value = "";
+		}
+	} while (read != EOF);
+	fclose(input);
 }
 
 void List::printListReverse() {
