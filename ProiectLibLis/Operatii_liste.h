@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <conio.h>
 
 /*
 TODO:
@@ -26,7 +25,7 @@ public:
 	List();
 	void emptyList();
 	void addNode(std::string, unsigned int);
-	void printList();
+	void printList(std::string dataType);
 	void printListReverse();
 	void deleteNode(unsigned int);
 };
@@ -48,6 +47,8 @@ public:
 	void push(std::string data);
 	void pop();
 };
+
+void readFromFile(std::string dataType);
 
 
 
