@@ -26,6 +26,7 @@ public:
 	void emptyList();
 	void addNode(std::string, unsigned int);
 	void printList(std::string dataType);
+	void readFromFile(std::string dataType);
 	void printListReverse();
 	void deleteNode(unsigned int);
 };
@@ -47,8 +48,6 @@ public:
 	void push(std::string data);
 	void pop();
 };
-
-void readFromFile(std::string dataType);
 
 
 

@@ -145,7 +145,7 @@ void List::printList(std::string dataType) {
 	fclose(output);
 }
 
-void readFromFile(std::string dataType) {
+void List::readFromFile(std::string dataType) {
 	FILE* input;
 	int read;
 	std::string value, filePath;
@@ -165,7 +165,7 @@ void readFromFile(std::string dataType) {
 		read = fgetc(input);
 		if (read != ',') value += read;
 		else {
-			std::cout << value << "\n";
+			addNode(value, length);
 			value = "";
 		}
 	} while (read != EOF);
