@@ -7,14 +7,16 @@ void List::emptyList() {
 	last = NULL;
 	length = 0;
 }
-
-List::List() {
-	emptyList();
-}
-Stack::Stack() {
+ListSLL::ListSLL() {
 	L.emptyList();
 }
-Queue::Queue() {
+ListDLL::ListDLL() {
+	L.emptyList();
+}
+ListStack::ListStack() {
+	L.emptyList();
+}
+ListQueue::ListQueue() {
 	L.emptyList();
 }
 
@@ -71,10 +73,10 @@ void List::addNode(std::string data, unsigned int node_id) {
 		length++;
 	}
 }
-void Stack::push(std::string data) {
+void ListStack::push(std::string data) {
 	L.addNode(data, 0);
 }
-void Queue::push(std::string data) {
+void ListQueue::push(std::string data) {
 	L.addNode(data, L.length);
 }
 
@@ -109,10 +111,10 @@ void List::deleteNode(unsigned int node_id) {
 		length--;
 	}
 }
-void Stack::pop() {
+void ListStack::pop() {
 	L.deleteNode(0);
 }
-void Queue::pop() {
+void ListQueue::pop() {
 	L.deleteNode(0);
 }
 
@@ -145,6 +147,19 @@ void List::printList(std::string dataType) {
 	fclose(output);
 }
 
+//void ListSLL::printList() {
+//	L.printList("sll");
+//}
+//void ListDLL::printList() {
+//	L.printList("dll");
+//}
+void ListStack::printStack() {
+	L.printList("s");
+}
+void ListQueue::printQueue() {
+	L.printList("q");
+}
+
 void List::readFromFile(std::string dataType) {
 	FILE* input;
 	int read;
@@ -166,6 +181,7 @@ void List::readFromFile(std::string dataType) {
 		if (read != ',') value += read;
 		else {
 			addNode(value, length);
+			//std::cout << value << " ";
 			value = "";
 		}
 	} while (read != EOF);

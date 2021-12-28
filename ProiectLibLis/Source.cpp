@@ -303,7 +303,7 @@ public:
         isInteractive = interactive;
         _color = color;
         
-        if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn") {
+        if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn" && id != "saveListsBtn" && id != "loadListsBtn") {
             makeInvisible();
         }
         
@@ -550,8 +550,10 @@ void updateScreen(RenderWindow* window)
                         Vector2f arrowSize = { 10,10 };
                         Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
                         float radius = (*element).getRadius();
-                        Vector2f orientation1 = { 0,radius };
-                        Vector2f orientation2 = { 0,-radius };
+                        /*Vector2f orientation1 = { 0,radius };
+                        Vector2f orientation2 = { 0,-radius };*/
+                        Vector2f orientation1 = { radius,0 };
+                        Vector2f orientation2 = { -radius,0 };
                         float dist = distanceBetweenTwoPoints(pos1, pos2);
                         /// de terminat
                        if( dist < 200.0 )
@@ -590,11 +592,11 @@ void updateScreen(RenderWindow* window)
                 }
                 for (auto element : NodesStack)
                 {
-                    //window->draw(*element);
+                    window->draw(*element);
                 }
                 for (auto element : NodesQueue)
                 {
-                    //window->draw(*element);
+                    window->draw(*element);
                 }
 
                 /// aici desenez butoanele
@@ -624,7 +626,10 @@ private:
     Vector2f nodeSpawn_position;
     int columns = 3;
     string ds_type;
-    List list;
+    ListSLL sll;
+    ListDLL dll;
+    ListStack stack;
+    ListQueue queue;
     Time speed = seconds(0.5);
 
     void update()
@@ -649,14 +654,28 @@ public:
     };
     void pushNode(string val , int position)
     {
+        if (ds_type == "sll")   sll.addNode(val, position);
+        if (ds_type == "dll")   dll.addNode(val, position);
         //int counter = (*Vector).size();
+        if (position > (*Vector).size()) position = (*Vector).size();
         Node* nod = new Node(nodeSpawn_position, 25, val , "node" + ds_type + val, ds_type);
         (*Vector).insert((*Vector).begin() + position,nod);
         sleep(speed);
         update();
     }
+    void pushFromFile(string val) {
+        int counter = (*Vector).size();
+        Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
+        (*Vector).insert((*Vector).begin() + counter, nod);
+        sleep(speed);
+        update();
+    }
     void pushBack(string val)
     {
+        if (ds_type == "sll")   sll.addNode(val, sll.length);
+        if (ds_type == "dll")   dll.addNode(val, dll.length);
+        if (ds_type == "s")     stack.addNode(val, stack.length);
+        if (ds_type == "q")     queue.addNode(val, queue.length);
         int counter = (*Vector).size();
         Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
         (*Vector).insert((*Vector).begin() + counter, nod);
@@ -665,6 +684,10 @@ public:
     }
     void pushFront(string val)
     {
+        if (ds_type == "sll")   sll.addNode(val, 0);
+        if (ds_type == "dll")   dll.addNode(val, 0);
+        if (ds_type == "s")     stack.addNode(val, 0);
+        if (ds_type == "q")     queue.addNode(val, 0);
         Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
         (*Vector).insert((*Vector).begin() , nod);
         sleep(speed);
@@ -673,6 +696,10 @@ public:
 
     void popBack()
     {
+        if (ds_type == "sll")   sll.deleteNode(sll.length);
+        if (ds_type == "dll")   dll.deleteNode(dll.length);
+        if (ds_type == "s")     stack.deleteNode(stack.length);
+        if (ds_type == "q")     queue.deleteNode(queue.length);
         (*Vector).back()->setColor(Color::Green);
         (*Vector).back()->setTextBelow("back");
         sleep(speed);
@@ -685,6 +712,10 @@ public:
 
     void popFront()
     {
+        if (ds_type == "sll")   sll.deleteNode(0);
+        if (ds_type == "dll")   dll.deleteNode(0);
+        if (ds_type == "s")     stack.deleteNode(0);
+        if (ds_type == "q")     queue.deleteNode(0);
         (*Vector).front()->setColor(Color::Green);
         (*Vector).front()->setTextBelow("front");
         sleep(speed);
@@ -697,6 +728,9 @@ public:
 
     void deleteNode(int counter)
     {
+        if (ds_type == "sll")   sll.deleteNode(counter);
+        if (ds_type == "dll")   dll.deleteNode(counter);
+        if (counter > (*Vector).size()) counter = (*Vector).size() - 1;
         for(int i=0 ; i <= counter ; i++)
         {
             (*Vector)[i]->setColor(Color::Blue);
@@ -740,11 +774,56 @@ public:
         (*Vector).clear();
 
     }
-
+    
+    void saveNodes()
+    {
+        if (ds_type == "sll")   sll.printList("sll");
+        if (ds_type == "dll")   dll.printList("dll");
+        if (ds_type == "s")     stack.printList("s");
+        if (ds_type == "q")     queue.printList("q");
+    }
+    
+    void loadNodes()
+    {
+        if (ds_type == "sll")
+        {
+            sll.readFromFile("sll");
+            node* itr = sll.first;
+            while (itr != NULL) {
+                pushFromFile(itr->data);
+                itr = itr->next;
+            }
+        }
+        if (ds_type == "dll")
+        {
+            dll.readFromFile("dll");
+            node* itr = dll.first;
+            while (itr != NULL) {
+                pushFromFile(itr->data);
+                itr = itr->next;
+            }
+        }
+        if (ds_type == "s") {
+            stack.readFromFile("s");
+            node* itr = stack.first;
+            while (itr != NULL) {
+                pushFromFile(itr->data);
+                itr = itr->next;
+            }
+        }
+        if (ds_type == "q") {
+            queue.readFromFile("q");
+            node* itr = queue.first;
+            while (itr != NULL) {
+                pushFromFile(itr->data);
+                itr = itr->next;
+            }
+        }
+    }
 };
 
 DataStructureVisualizer SLL({ 100,300 }, 3, &NodesSLL);
-DataStructureVisualizer DLL({ 550,300 }, 1, &NodesDLL, "dll");
+DataStructureVisualizer DLL({ 450,300 }, 3, &NodesDLL, "dll");
 DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
 DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
 
@@ -761,7 +840,10 @@ void resolveCustomEvents()
         {
             if (event == "click")
             {
-                if (optionForDS == "SLL") SLL.erase();
+                if (optionForDS == "SLL")   SLL.erase();
+                if (optionForDS == "DLL")   DLL.erase();
+                if (optionForDS == "S")     S.erase();
+                if (optionForDS == "Q")     Q.erase();
             }
         }
         else if (id == "addNodeBtn")
@@ -793,7 +875,25 @@ void resolveCustomEvents()
                     }
                 }
                 //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
-                else  if (optionForDS == "DLL") DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());
+                else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
+                {
+                    if (isPositiveNumber(pos) && val != "Value") {
+                        DLL.pushNode(val, stoi(pos));
+                    }
+                    else if (val != "Value")
+                    {
+                        DLL.pushBack(val);
+
+                    }
+                    else if (isPositiveNumber(pos))
+                    {
+                        DLL.pushNode(to_string(NodesDLL.size()), stoi(pos));
+                    }
+                    else
+                    {
+                        DLL.pushBack(to_string(NodesDLL.size()));
+                    }
+                }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
                 ButonDictionar["ti_addNodeData"]->setText("Value");
@@ -807,6 +907,74 @@ void resolveCustomEvents()
             {
            // if (optionForDS == "S") S.pushNode(to_string(NodesStack.size()));
            // else  if (optionForDS == "Q") Q.pushNode(to_string(NodesQueue.size()));
+                string val;
+                val = ButonDictionar["ti_addNodeData"]->getText();
+                if (optionForDS == "Q")
+                {
+                    if (val != "Value")
+                    {
+                        Q.pushBack(val);
+                    }
+                    else
+                        Q.pushBack(to_string(NodesQueue.size()));
+                }
+                if (optionForDS == "S")
+                {
+                    if (val != "Value")
+                    {
+                        S.pushFront(val);
+                    }
+                    else
+                        S.pushFront(to_string(NodesStack.size())); 
+                }
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText("Value");
+            }
+        }
+        else if (id == "pushFrontBtn")
+        {
+            if (event == "click")
+            {
+                string val;
+                val = ButonDictionar["ti_addNodeData"]->getText();
+                if (optionForDS == "SLL")
+                {
+                    if (val != "Value") SLL.pushFront(val);
+                    else
+                        SLL.pushFront(to_string(NodesSLL.size()));
+                }
+                //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
+                else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
+                {
+                    if (val != "Value") DLL.pushFront(val);
+                    else
+                        DLL.pushFront(to_string(NodesDLL.size()));
+                }
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText("Value");
+            }
+        }
+        else if (id == "pushBackBtn")
+        {
+            if (event == "click")
+            {
+                string val;
+                val = ButonDictionar["ti_addNodeData"]->getText();
+                if (optionForDS == "SLL")
+                {
+                    if (val != "Value") SLL.pushBack(val);
+                    else
+                        SLL.pushBack(to_string(NodesSLL.size()));
+                }
+                //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
+                else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
+                {
+                    if (val != "Value") DLL.pushBack(val);
+                    else
+                        DLL.pushBack(to_string(NodesDLL.size()));
+                }
+                ButonDictionar["ti_addNodeData"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText("Value");
             }
         }
         else if (id == "delNodeBtn")
@@ -834,22 +1002,53 @@ void resolveCustomEvents()
                 ButonDictionar["ti_addNodePos"]->setText("Position");
             }
         }
+        else if (id == "popNodeBtn")
+        {
+            if (event == "click")
+            {
+                if (optionForDS == "Q") Q.popFront();
+
+                if (optionForDS == "S") S.popFront();
+            }
+        }
+        else if (id == "popFrontBtn")
+        {
+            if (event == "click")
+            {
+                if (optionForDS == "SLL")   SLL.popFront();
+
+                if (optionForDS == "DLL")   DLL.popFront();
+            }
+        }
+        else if (id == "popBackBtn")
+        {
+            if (event == "click")
+            {
+                if(optionForDS == "SLL")   SLL.popBack();
+
+                if (optionForDS == "DLL")   DLL.popBack();
+            }
+        }
         else if (id == "sllBtn")
         {
             if (event == "click")
             {
                 optionForDS = "SLL";
                 ButonDictionar["newListBtn"]->makeVisible();
+                //ButonDictionar["clearListBtn"]->makeVisible();
+                
                 ButonDictionar["addNodeBtn"]->makeVisible();
+                ButonDictionar["pushNodeBtn"]->makeInvisible();
+                ButonDictionar["pushFrontBtn"]->makeVisible();
+                ButonDictionar["pushBackBtn"]->makeVisible();
+
                 ButonDictionar["delNodeBtn"]->makeVisible();
+                ButonDictionar["popNodeBtn"]->makeInvisible();
+                ButonDictionar["popFrontBtn"]->makeVisible();
+                ButonDictionar["popBackBtn"]->makeVisible();
+
                 ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
-                ButonDictionar["popNodeBtn"]->makeInvisible();
-                ButonDictionar["pushNodeBtn"]->makeInvisible();
-
-
-
-
             }
         }
         else if (id == "dllBtn")
@@ -858,10 +1057,20 @@ void resolveCustomEvents()
             {
                 optionForDS = "DLL";
                 ButonDictionar["newListBtn"]->makeVisible();
+                //ButonDictionar["clearListBtn"]->makeVisible();
+
                 ButonDictionar["addNodeBtn"]->makeVisible();
-                ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["pushNodeBtn"]->makeInvisible();
+                ButonDictionar["pushFrontBtn"]->makeVisible();
+                ButonDictionar["pushBackBtn"]->makeVisible();
+
+                ButonDictionar["delNodeBtn"]->makeVisible();
                 ButonDictionar["popNodeBtn"]->makeInvisible();
+                ButonDictionar["popFrontBtn"]->makeVisible();
+                ButonDictionar["popBackBtn"]->makeVisible();
+
+                ButonDictionar["ti_addNodePos"]->makeVisible();
+                ButonDictionar["ti_addNodeData"]->makeVisible();
             }
         }
         else if (id == "stackBtn")
@@ -870,10 +1079,20 @@ void resolveCustomEvents()
             {
                 optionForDS = "S";
                 ButonDictionar["newListBtn"]->makeVisible();
+                //ButonDictionar["clearListBtn"]->makeVisible();
+
                 ButonDictionar["addNodeBtn"]->makeInvisible();
-                ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeVisible();
+                ButonDictionar["pushFrontBtn"]->makeInvisible();
+                ButonDictionar["pushBackBtn"]->makeInvisible();
+
+                ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["popNodeBtn"]->makeVisible();
+                ButonDictionar["popFrontBtn"]->makeInvisible();
+                ButonDictionar["popBackBtn"]->makeInvisible();
+
+                ButonDictionar["ti_addNodePos"]->makeInvisible();
+                ButonDictionar["ti_addNodeData"]->makeVisible();
             }
         }
         else if (id == "queueBtn")
@@ -882,10 +1101,40 @@ void resolveCustomEvents()
             {
                 optionForDS = "Q";
                 ButonDictionar["newListBtn"]->makeVisible();
+                //ButonDictionar["clearListBtn"]->makeVisible();
+
                 ButonDictionar["addNodeBtn"]->makeInvisible();
-                ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["pushNodeBtn"]->makeVisible();
+                ButonDictionar["pushFrontBtn"]->makeInvisible();
+                ButonDictionar["pushBackBtn"]->makeInvisible();
+
+                ButonDictionar["delNodeBtn"]->makeInvisible();
                 ButonDictionar["popNodeBtn"]->makeVisible();
+                ButonDictionar["popFrontBtn"]->makeInvisible();
+                ButonDictionar["popBackBtn"]->makeInvisible();
+
+                ButonDictionar["ti_addNodePos"]->makeInvisible();
+                ButonDictionar["ti_addNodeData"]->makeVisible();
+            }
+        }
+        else if (id == "saveListsBtn")
+        {
+            if (event == "click")
+            {
+                if (optionForDS == "SLL")   SLL.saveNodes();
+                if (optionForDS == "DLL")   DLL.saveNodes();
+                if (optionForDS == "S")     S.saveNodes();
+                if (optionForDS == "Q")     Q.saveNodes();
+            }
+        }
+        else if (id == "loadListsBtn")
+        {
+            if (event == "click")
+            {
+                if (optionForDS == "SLL")   SLL.loadNodes();
+                if (optionForDS == "DLL")   DLL.loadNodes();
+                if (optionForDS == "S")     S.loadNodes();
+                if (optionForDS == "Q")     Q.loadNodes();
             }
         }
     }
@@ -914,15 +1163,27 @@ int main()
     ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
     ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
     ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
-    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 300,50 }, "New List", "newListBtn");
+
+    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, "New List", "newListBtn");
+    //ButonDictionar["clearListBtn"] = new Buton({ 1200,700 }, { 290,50 }, "Clear List", "clearListBtn");
+
     ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, "Add", "addNodeBtn");
-    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 150,50 }, "Delete", "delNodeBtn");
-    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,500 }, { 300,50 }, "Push node", "pushNodeBtn");
-    ButonDictionar["popNodeBtn"] = new Buton({ 1200,600 }, { 300,50 }, "Pop node", "popNodeBtn");
-    ButonDictionar["clearListBtn"] = new Buton( {1200,700},{300,50},"Clear List","clearListBtn" );
+    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, "Push", "pushNodeBtn");
+    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, "+Front", "pushFrontBtn");
+    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, "+Back", "pushBackBtn");
+   
+    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, "Delete", "delNodeBtn");
+    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, "Pop", "popNodeBtn");
+    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, "-Front", "popFrontBtn");
+    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, "-Back", "popBackBtn");
+    
+    
+    
+    ButonDictionar["saveLists"] = new Buton({ 1240,0 }, { 100,50 }, "Save", "saveListsBtn");
+    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 100,50 }, "Load", "loadListsBtn");
 
     ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, "Position", "ti_addNodePos");
-    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 150,50 }, "Value", "ti_addNodeData");
+    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, "Value", "ti_addNodeData");
 
 
 
@@ -932,6 +1193,33 @@ int main()
     Element* target = nullptr;
     bool press = false;
     string ti_input;
+    /*ListSLL sll;
+    ListDLL dll;
+    ListStack stack;
+    ListQueue queue;
+    sll.addNode("sll1", 0);
+    sll.addNode("sll2", 1);
+    sll.addNode("sll3", 2);
+    sll.addNode("sll4", 3);
+    sll.printList("sll");
+
+    dll.addNode("dll1", 0);
+    dll.addNode("dll2", 1);
+    dll.addNode("dll3", 2);
+    dll.addNode("dll4", 3);
+    dll.printList("dll");
+
+    stack.push("stack1");
+    stack.push("stack2");
+    stack.push("stack3");
+    stack.printStack();
+
+    queue.push("queue1");
+    queue.push("queue2");
+    queue.push("queue3");
+    queue.printQueue();*/
+
+    if (NodesSLL.empty()) cout << "sll is empty";
 
     while (window.isOpen())
     {
