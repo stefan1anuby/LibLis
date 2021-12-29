@@ -22,33 +22,50 @@ public:
 	node* last;
 	unsigned int length;
 public:
-	List();
+	//List();
 	void emptyList();
 	void addNode(std::string, unsigned int);
 	void printList(std::string dataType);
+	void readFromFile(std::string dataType);
 	void printListReverse();
 	void deleteNode(unsigned int);
 };
 
-class Stack {
+class ListSLL : public List {
 private:
 	List L;
 public:
-	Stack();
-	void push(std::string data);
-	void pop();
+	ListSLL();
+	//void printList();
 };
 
-class Queue {
+class ListDLL : public List {
+private: 
+	List L;
+public:
+	ListDLL();
+	//void printList();
+};
+
+class ListStack : public List {
 private:
 	List L;
 public:
-	Queue();
+	ListStack();
 	void push(std::string data);
 	void pop();
+	void printStack();
 };
 
-void readFromFile(std::string dataType);
+class ListQueue : public List {
+private:
+	List L;
+public:
+	ListQueue();
+	void push(std::string data);
+	void pop();
+	void printQueue();
+};
 
 
 
