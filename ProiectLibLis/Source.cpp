@@ -10,7 +10,7 @@
 using namespace sf;
 using namespace std;
 
-#define FRAME_INTERVAL 20
+#define FRAME_INTERVAL 15
 #define WIDTH_SCREEN 1500
 #define HEIGHT_SCREEN 800
 
@@ -506,7 +506,13 @@ void updateScreen(RenderWindow* window)
 
                 /// asta e pentru evitarea erorii de accesare a unei memorii din diferite thread uri
                 vector < Node* > copyNodesSLL;
+                vector < Node* > copyNodesDLL;
+                vector < Node* > copyNodesStack;
+                vector < Node* > copyNodesQueue;
                 copyNodesSLL = NodesSLL;
+                copyNodesDLL = NodesDLL;
+                copyNodesStack = NodesStack;
+                copyNodesQueue = NodesQueue;
 
 
                 for (auto element : copyNodesSLL)
@@ -546,20 +552,18 @@ void updateScreen(RenderWindow* window)
                 last = nullptr;
                 counter = 0;
 
-                for (auto element : NodesDLL)
+                for (auto element : copyNodesDLL)
                 {
                     if (last != nullptr) {
                         Vector2f width = { 1,1 };
                         Vector2f arrowSize = { 10,10 };
                         Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
                         float radius = (*element).getRadius();
-                        /*Vector2f orientation1 = { 0,radius };
-                        Vector2f orientation2 = { 0,-radius };*/
                         Vector2f orientation1 = { radius,0 };
                         Vector2f orientation2 = { -radius,0 };
                         float dist = distanceBetweenTwoPoints(pos1, pos2);
                         /// de terminat
-                       if( dist < 200.0 )
+                       if( dist < 230.0 )
                         {
                             ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
                             ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
@@ -574,38 +578,41 @@ void updateScreen(RenderWindow* window)
                     last = element;
                     //window->draw(*element);
                 }
-                for (auto element : NodesStack)
+                for (auto element : copyNodesStack)
                 {
                     //window->draw(*element);
                 }
-                for (auto element : NodesQueue)
+                for (auto element : copyNodesQueue)
                 {
                     //window->draw(*element);
                 }
 
 
                 /// aici desenez nodurile
-                for (auto element : NodesSLL)
+                for (auto element : copyNodesSLL)
                 {
                     window->draw(*element);
                 }
-                for (auto element : NodesDLL)
+                for (auto element : copyNodesDLL)
                 {
                     window->draw(*element);
                 }
-                for (auto element : NodesStack)
+                for (auto element : copyNodesStack)
                 {
                     window->draw(*element);
                 }
-                for (auto element : NodesQueue)
+                for (auto element : copyNodesQueue)
                 {
                     window->draw(*element);
                 }
 
+                vector < Element* > copyElements;
+                copyElements = Elements;
+
                 /// aici desenez butoanele
-                for (auto element : Elements)
+                for (auto element : copyElements)
                 {
-                    window->draw(*element);
+                     window->draw(*element);
                 }
 
             }
@@ -1052,6 +1059,11 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["sllBtn"]->setColor(Color::Green);
+                ButonDictionar["dllBtn"]->setColor(Color::Blue);
+                ButonDictionar["stackBtn"]->setColor(Color::Blue);
+                ButonDictionar["queueBtn"]->setColor(Color::Blue);
             }
         }
         else if (id == "dllBtn")
@@ -1074,6 +1086,11 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["sllBtn"]->setColor(Color::Blue);
+                ButonDictionar["dllBtn"]->setColor(Color::Green);
+                ButonDictionar["stackBtn"]->setColor(Color::Blue);
+                ButonDictionar["queueBtn"]->setColor(Color::Blue);
             }
         }
         else if (id == "stackBtn")
@@ -1096,6 +1113,11 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeInvisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["sllBtn"]->setColor(Color::Blue);
+                ButonDictionar["dllBtn"]->setColor(Color::Blue);
+                ButonDictionar["stackBtn"]->setColor(Color::Green);
+                ButonDictionar["queueBtn"]->setColor(Color::Blue);
             }
         }
         else if (id == "queueBtn")
@@ -1118,6 +1140,11 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeInvisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["sllBtn"]->setColor(Color::Blue);
+                ButonDictionar["dllBtn"]->setColor(Color::Blue);
+                ButonDictionar["stackBtn"]->setColor(Color::Blue);
+                ButonDictionar["queueBtn"]->setColor(Color::Green);
             }
         }
         else if (id == "saveListsBtn")
@@ -1245,6 +1272,9 @@ int main()
             }
             if (target == nullptr)
             {
+                /// onHover la noduri dezactivat temporar
+
+                /*
                 for (auto element : Nodes)
                 {
                     if (element->isInRange(mousePosition))
@@ -1253,6 +1283,7 @@ int main()
                         target->onHover();
                     }
                 }
+                */
             }
 
             if (event.type == Event::Closed)
