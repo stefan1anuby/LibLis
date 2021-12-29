@@ -263,10 +263,7 @@ public:
         setPosition(position + direction);
     }
 
-    static Node getNewNode()
-    {
-        //return new Node();
-    }
+ 
     void setTextBelow(string str)
     {
         below_text.setString(str);
@@ -506,7 +503,13 @@ void updateScreen(RenderWindow* window)
                 // aici desenez legaturile dintre noduri
                 Node* last = nullptr;
                 int counter = 0;
-                for (auto element : NodesSLL)
+
+                /// asta e pentru evitarea erorii de accesare a unei memorii din diferite thread uri
+                vector < Node* > copyNodesSLL;
+                copyNodesSLL = NodesSLL;
+
+
+                for (auto element : copyNodesSLL)
                 {
                     if (last != nullptr) {
                         Vector2f width = { 1,1 };
