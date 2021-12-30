@@ -3,9 +3,11 @@
 #include "Operatii_liste.h";
 
 void List::emptyList() {
-	first = NULL;
+	/*first = NULL;
 	last = NULL;
-	length = 0;
+	length = 0;*/
+	while (first != NULL)
+		deleteNode(0);
 }
 ListSLL::ListSLL() {
 	L.emptyList();
@@ -88,7 +90,10 @@ void List::deleteNode(unsigned int node_id) {
 	node* prev = NULL;
 	node* temp = iterator;
 	if (temp != NULL && node_id == 0) {
-		temp->next->previous = NULL;
+		if (temp->next != NULL)
+			temp->next->previous = NULL;
+		else
+			last = temp->next;
 		first = temp->next;
 		delete temp;
 		length--;
@@ -191,6 +196,7 @@ void List::readFromFile(std::string dataType) {
 void List::printListReverse() {
 	node* iterator = last;
 	unsigned int current_node = length - 1;
+	if (iterator == NULL) std::cout << "List is empty.";
 	while (iterator != NULL) {
 		std::cout << "[" << current_node << "]" << iterator->data << "\n";
 		iterator = iterator->previous;

@@ -775,6 +775,10 @@ public:
 
     void erase()
     {
+        if (ds_type == "sll")   sll.emptyList();
+        if (ds_type == "dll")   dll.emptyList();
+        if (ds_type == "s")     stack.emptyList();
+        if (ds_type == "q")     queue.emptyList();
         for (auto node : (*Vector))
         {
             requestForAnimation.push({ node,{-100,1500} });
@@ -1226,8 +1230,8 @@ int main()
     /*ListSLL sll;
     ListDLL dll;
     ListStack stack;
-    ListQueue queue;
-    sll.addNode("sll1", 0);
+    ListQueue queue;*/
+    /*sll.addNode("sll1", 0);
     sll.addNode("sll2", 1);
     sll.addNode("sll3", 2);
     sll.addNode("sll4", 3);
