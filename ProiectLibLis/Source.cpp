@@ -32,6 +32,11 @@ vector < Node* > NodesQueue;
 
 unordered_map < string, Buton* > ButonDictionar;
 
+unordered_map < string, unordered_map < string, string > > Language;
+string limba_aleasa = "engleza";
+/// EXEMPLU: Language[ limba_aleasa ]["cuvant"] = "word";
+
+
 queue < pair < string, string > > customEvents;
 /// optiunea de structura de date aleasa de utilizator
 string optionForDS;
@@ -496,7 +501,8 @@ void updateScreen(RenderWindow* window)
     {
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
-            window->clear(Color::White);
+            //window->clear(Color::White);
+            window->clear(sf::Color(39 * 25, 39 * 25, 39 * 25 ));
             
             try
             {
@@ -640,7 +646,7 @@ private:
     ListDLL dll;
     ListStack stack;
     ListQueue queue;
-    Time speed = seconds(0.5);
+    Time speed = seconds(1.5);
 
     void update()
     {
@@ -1009,7 +1015,10 @@ void resolveCustomEvents()
                         SLL.popBack();
                     }
                 }
-                else if (optionForDS == "DLL") DLL.deleteNode(4);
+                else if (optionForDS == "DLL") 
+                {
+                    //DLL.deleteNode(4);
+                }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
                 ButonDictionar["ti_addNodeData"]->setText("Value");
