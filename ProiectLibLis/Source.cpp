@@ -33,8 +33,58 @@ vector < Node* > NodesQueue;
 unordered_map < string, Buton* > ButonDictionar;
 
 unordered_map < string, unordered_map < string, string > > Language;
-string limba_aleasa = "engleza";
+string limba = "en";
+//string limba_aleasa = "engleza";
 /// EXEMPLU: Language[ limba_aleasa ]["cuvant"] = "word";
+
+void words() {
+    Language["en"]["sll"] = "Singly Linked List";
+    Language["en"]["dll"] = "Doubly Linked List";
+    Language["en"]["stack"] = "Stack";
+    Language["en"]["queue"] = "Queue";
+
+    Language["en"]["newList"] = "New List";
+
+    Language["en"]["addNode"] = "Add";
+    Language["en"]["pushNode"] = "Push";
+    Language["en"]["pushFront"] = "+Front";
+    Language["en"]["pushBack"] = "+Back";
+
+    Language["en"]["delNode"] = "Delete";
+    Language["en"]["popNode"] = "Pop";
+    Language["en"]["popFront"] = "-Front";
+    Language["en"]["popBack"] = "-Back";
+
+    Language["en"]["saveLists"] = "Save";
+    Language["en"]["loadLists"] = "Load";
+
+    Language["en"]["ti_addNodePos"] = "Position";
+    Language["en"]["ti_addNodeData"] = "Value";
+
+    Language["ro"]["sll"] = "Lista Simplu Inlantuita";
+    Language["ro"]["dll"] = "Lista Dublu Inlantuita";
+    Language["ro"]["stack"] = "Stiva";
+    Language["ro"]["queue"] = "Coada";
+
+    Language["ro"]["newList"] = "Lista noua";
+
+    Language["ro"]["addNode"] = "Adauga";
+    Language["ro"]["pushNode"] = "Push";
+    Language["ro"]["pushFront"] = "+Fata";
+    Language["ro"]["pushBack"] = "+Coada";
+
+    Language["ro"]["delNode"] = "Sterge";
+    Language["ro"]["popNode"] = "Pop";
+    Language["ro"]["popFront"] = "-Fata";
+    Language["ro"]["popBack"] = "-Coada";
+
+    Language["ro"]["saveLists"] = "Salvare";
+    Language["ro"]["loadLists"] = "Incarcare";
+
+    Language["ro"]["ti_addNodePos"] = "Pozitie";
+    Language["ro"]["ti_addNodeData"] = "Valoare";
+}
+
 
 
 queue < pair < string, string > > customEvents;
@@ -305,7 +355,7 @@ public:
         isInteractive = interactive;
         _color = color;
         
-        if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn" && id != "saveListsBtn" && id != "loadListsBtn") {
+        if (id != "sllBtn" && id != "dllBtn" && id != "stackBtn" && id != "queueBtn" && id != "saveListsBtn" && id != "loadListsBtn" && id != "languageBtn") {
             makeInvisible();
         }
         
@@ -847,6 +897,64 @@ DataStructureVisualizer DLL({ 450,300 }, 3, &NodesDLL, "dll");
 DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
 DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
 
+void switchLanguage(string lang) {
+    if (lang == "ro") {
+        ButonDictionar["sllBtn"]->setText(Language["en"]["sll"]);
+        ButonDictionar["dllBtn"]->setText(Language["en"]["dll"]);
+        ButonDictionar["stackBtn"]->setText(Language["en"]["stack"]);
+        ButonDictionar["queueBtn"]->setText(Language["en"]["queue"]);
+
+        ButonDictionar["newListBtn"]->setText(Language["en"]["newList"]);
+
+        ButonDictionar["addNodeBtn"]->setText(Language["en"]["addNode"]);
+        ButonDictionar["pushNodeBtn"]->setText(Language["en"]["pushNode"]);
+        ButonDictionar["pushFrontBtn"]->setText(Language["en"]["pushFront"]);
+        ButonDictionar["pushBackBtn"]->setText(Language["en"]["pushBack"]);
+
+        ButonDictionar["delNodeBtn"]->setText(Language["en"]["delNode"]);
+        ButonDictionar["popNodeBtn"]->setText(Language["en"]["popNode"]);
+        ButonDictionar["popFrontBtn"]->setText(Language["en"]["popFront"]);
+        ButonDictionar["popBackBtn"]->setText(Language["en"]["popBack"]);
+
+
+
+        ButonDictionar["saveLists"]->setText(Language["en"]["saveLists"]);
+        ButonDictionar["loadLists"]->setText(Language["en"]["loadLists"]);
+
+        ButonDictionar["ti_addNodePos"]->setText(Language["en"]["ti_addNodePos"]);
+        ButonDictionar["ti_addNodeData"]->setText(Language["en"]["ti_addNodeData"]);
+
+        ButonDictionar["languageBtn"]->setText("en");
+    }
+    if (lang == "en") {
+        ButonDictionar["sllBtn"]->setText(Language["ro"]["sll"]);
+        ButonDictionar["dllBtn"]->setText(Language["ro"]["dll"]);
+        ButonDictionar["stackBtn"]->setText(Language["ro"]["stack"]);
+        ButonDictionar["queueBtn"]->setText(Language["ro"]["queue"]);
+
+        ButonDictionar["newListBtn"]->setText(Language["ro"]["newList"]);
+
+        ButonDictionar["addNodeBtn"]->setText(Language["ro"]["addNode"]);
+        ButonDictionar["pushNodeBtn"]->setText(Language["ro"]["pushNode"]);
+        ButonDictionar["pushFrontBtn"]->setText(Language["ro"]["pushFront"]);
+        ButonDictionar["pushBackBtn"]->setText(Language["ro"]["pushBack"]);
+
+        ButonDictionar["delNodeBtn"]->setText(Language["ro"]["delNode"]);
+        ButonDictionar["popNodeBtn"]->setText(Language["ro"]["popNode"]);
+        ButonDictionar["popFrontBtn"]->setText(Language["ro"]["popFront"]);
+        ButonDictionar["popBackBtn"]->setText(Language["ro"]["popBack"]);
+
+
+
+        ButonDictionar["saveLists"]->setText(Language["ro"]["saveLists"]);
+        ButonDictionar["loadLists"]->setText(Language["ro"]["loadLists"]);
+
+        ButonDictionar["ti_addNodePos"]->setText(Language["ro"]["ti_addNodePos"]);
+        ButonDictionar["ti_addNodeData"]->setText(Language["ro"]["ti_addNodeData"]);
+
+        ButonDictionar["languageBtn"]->setText("ro");
+    }
+}
 
 void resolveCustomEvents()
 {
@@ -1180,6 +1288,13 @@ void resolveCustomEvents()
                 if (optionForDS == "Q")     Q.loadNodes();
             }
         }
+        else if (id == "languageBtn")
+        {
+            if (event == "click")
+            {
+                switchLanguage(ButonDictionar["languageBtn"]->getText());
+            }
+        }
     }
 }
 
@@ -1199,34 +1314,36 @@ int main()
     Sound sound;
     sound.setBuffer(buffer);
     sound.play();*/
-
+    words();
 
     /// IN LOC SA CREEZ VARIABILE MAI BINE LE PUN IN DICTIONAR DIRECT
-    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, "Singly Linked List", "sllBtn");
-    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, "Doubly Linked List", "dllBtn");
-    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, "Stack", "stackBtn");
-    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, "Queue", "queueBtn");
+    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, Language[limba]["sll"], "sllBtn");
+    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, Language[limba]["dll"], "dllBtn");
+    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, Language[limba]["stack"], "stackBtn");
+    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, Language[limba]["queue"], "queueBtn");
 
-    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, "New List", "newListBtn");
+    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, Language[limba]["newList"], "newListBtn");
     //ButonDictionar["clearListBtn"] = new Buton({ 1200,700 }, { 290,50 }, "Clear List", "clearListBtn");
 
-    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, "Add", "addNodeBtn");
-    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, "Push", "pushNodeBtn");
-    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, "+Front", "pushFrontBtn");
-    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, "+Back", "pushBackBtn");
+    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["addNode"], "addNodeBtn");
+    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["pushNode"], "pushNodeBtn");
+    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, Language[limba]["pushFront"], "pushFrontBtn");
+    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, Language[limba]["pushBack"], "pushBackBtn");
    
-    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, "Delete", "delNodeBtn");
-    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, "Pop", "popNodeBtn");
-    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, "-Front", "popFrontBtn");
-    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, "-Back", "popBackBtn");
+    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["delNode"], "delNodeBtn");
+    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["popNode"], "popNodeBtn");
+    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, Language[limba]["popFront"], "popFrontBtn");
+    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, Language[limba]["popBack"], "popBackBtn");
     
     
     
-    ButonDictionar["saveLists"] = new Buton({ 1240,0 }, { 100,50 }, "Save", "saveListsBtn");
-    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 100,50 }, "Load", "loadListsBtn");
+    ButonDictionar["saveLists"] = new Buton({ 1240,0 }, { 100,50 }, Language[limba]["saveLists"], "saveListsBtn");
+    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 100,50 }, Language[limba]["loadLists"], "loadListsBtn");
 
-    ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, "Position", "ti_addNodePos");
-    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, "Value", "ti_addNodeData");
+    ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, Language[limba]["ti_addNodePos"], "ti_addNodePos");
+    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, Language[limba]["ti_addNodeData"], "ti_addNodeData");
+
+    ButonDictionar["languageBtn"] = new Buton({ 1400,720 }, { 60,40 }, limba, "languageBtn");
 
 
 
