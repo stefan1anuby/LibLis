@@ -618,6 +618,12 @@ void updateScreen(RenderWindow* window)
                         float radius = (*element).getRadius();
                         Vector2f orientation1 = { radius,0 };
                         Vector2f orientation2 = { -radius,0 };
+
+                        if (counter % 3 == 0) {
+                            orientation1 = { -radius ,radius };
+                            orientation2 = { radius ,-radius };
+                            arrowSize = { 5 ,5 };
+                        }
                         float dist = distanceBetweenTwoPoints(pos1, pos2);
                         /// de terminat
                        if( dist < 230.0 )
@@ -1126,7 +1132,13 @@ void resolveCustomEvents()
                 }
                 else if (optionForDS == "DLL") 
                 {
-                    //DLL.deleteNode(4);
+                    if (isPositiveNumber(pos)) {
+                        DLL.deleteNode(stoi(pos));
+                    }
+                    else
+                    {
+                        DLL.popBack();
+                    }
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
