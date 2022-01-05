@@ -209,14 +209,14 @@ public:
 class Node : public Element
 {
 private:
-    Text text;
-    Text below_text;
+    Text text,below_text,onTop_text;
     string info;
 
     void updateTextPosition()
     {
         text.setPosition({ position.x - (text.getLocalBounds().width / 2) - 0, position.y - (text.getLocalBounds().height / 2) - 5 });
         below_text.setPosition({ position.x - (below_text.getLocalBounds().width / 2) - 0, position.y - (below_text.getLocalBounds().height / 2) + 30 });
+        onTop_text.setPosition({ position.x - (onTop_text.getLocalBounds().width / 2) - 0, position.y - (onTop_text.getLocalBounds().height / 2) - 50 });
     }
 
 public:
@@ -235,6 +235,7 @@ public:
         text.setCharacterSize(23);
         
         below_text.setFillColor(Color::Black);
+        onTop_text.setFillColor(Color::Black);
 
         updateTextPosition();
 
@@ -295,6 +296,7 @@ public:
             target.draw(circle, states);
             target.draw(text, states);
             target.draw(below_text, states);
+            target.draw(onTop_text, states);
         }
     }
 
@@ -329,6 +331,22 @@ public:
     void setTextBelowColor(Color color)
     {
         below_text.setFillColor(color);
+    }
+    void setTextOnTop(string str)
+    {
+        onTop_text.setString(str);
+        onTop_text.setFont(font);
+        updateTextPosition();
+    }
+    void setTextOnTopColor(Color color)
+    {
+        onTop_text.setFillColor(color);
+    }
+
+    void setBorder(float thickness, Color color)
+    {
+        circle.setOutlineThickness(thickness);
+        circle.setOutlineColor(color);
     }
 };
 
@@ -574,6 +592,16 @@ void updateScreen(RenderWindow* window)
 
                 for (auto element : copyNodesSLL)
                 {
+                    if (counter == 0) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("head");
+                    }
+                    else
+                    {
+                        (*element).setBorder(0, Color::Black);
+                        (*element).setTextOnTop("");
+                    }
+
                     if (last != nullptr) {
                         Vector2f width = { 1,1 };
                         Vector2f arrowSize = { 8,8 };
@@ -587,6 +615,7 @@ void updateScreen(RenderWindow* window)
                             orientation2 = { radius ,-radius };
                             arrowSize = { 5 ,5 };
                         }
+
 
                         float dist = distanceBetweenTwoPoints(pos1, pos2);
                         /// de terminat
@@ -611,6 +640,20 @@ void updateScreen(RenderWindow* window)
 
                 for (auto element : copyNodesDLL)
                 {
+                    if (counter == 0) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("head");
+                    }
+                    else if (counter == copyNodesDLL.size() - 1) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("tail");
+                    }
+                    else
+                    {
+                        (*element).setBorder(0, Color::Black);
+                        (*element).setTextOnTop("");
+                    }
+
                     if (last != nullptr) {
                         Vector2f width = { 1,1 };
                         Vector2f arrowSize = { 10,10 };
@@ -641,13 +684,90 @@ void updateScreen(RenderWindow* window)
                     last = element;
                     //window->draw(*element);
                 }
+
+                last = nullptr;
+                counter = 0;
+
                 for (auto element : copyNodesStack)
                 {
                     //window->draw(*element);
+                    if (counter == 0) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("top");
+                    }
+                    else
+                    {
+                        (*element).setBorder(0, Color::Black);
+                        (*element).setTextOnTop("");
+                    }
+
+                    if (last != nullptr) {
+                        Vector2f width = { 1,1 };
+                        Vector2f arrowSize = { 8,8 };
+                        Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
+                        float radius = (*element).getRadius();
+                        Vector2f orientation1 = { 0,radius };
+                        Vector2f orientation2 = { 0,-radius };
+
+                        float dist = distanceBetweenTwoPoints(pos1, pos2);
+                        /// de terminat
+                        if (dist < 230.0)
+                        {
+                            ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
+                            ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
+                            //ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
+
+                            window->draw(ar);
+                            window->draw(ar2);
+                            // window->draw(ar3);
+                        }
+
+                    }
+
+                    counter++;
+                    last = element;
                 }
+
+                last = nullptr;
+                counter = 0;
+
                 for (auto element : copyNodesQueue)
                 {
                     //window->draw(*element);
+                    if (counter == 0) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("front");
+                    }
+                    else
+                    {
+                        (*element).setBorder(0, Color::Black);
+                        (*element).setTextOnTop("");
+                    }
+
+                    if (last != nullptr) {
+                        Vector2f width = { 1,1 };
+                        Vector2f arrowSize = { 8,8 };
+                        Vector2f pos1 = (*last).getPosition(), pos2 = (*element).getPosition();
+                        float radius = (*element).getRadius();
+                        Vector2f orientation1 = { 0,radius };
+                        Vector2f orientation2 = { 0,-radius };
+
+                        float dist = distanceBetweenTwoPoints(pos1, pos2);
+                        /// de terminat
+                        if (dist < 230.0)
+                        {
+                            ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
+                            ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
+                            //ConvexShape ar3 = getArrow(pos2 + orientation2, pos1 + orientation1, "sharp", width, arrowSize);
+
+                            window->draw(ar);
+                            window->draw(ar2);
+                            // window->draw(ar3);
+                        }
+
+                    }
+                    counter++;
+                    last = element;
                 }
 
 
