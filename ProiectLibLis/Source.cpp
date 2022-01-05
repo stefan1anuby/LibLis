@@ -394,11 +394,13 @@ public:
     // cu asta recalculez pozitia textului din element
     void updateTextPosition()
     {
+        text.setCharacterSize(24);
         text_width = text.getLocalBounds().width;
         text_height = text.getLocalBounds().height;
         float padding_left = (rectangle.getSize().x - text_width) / 2;
         float padding_top = (rectangle.getSize().y - text_height) / 2;
-        text.setPosition(rectangle.getPosition() + Vector2f({ padding_left,padding_top }) + Vector2f({ -3,-6 }));
+        Vector2f position = rectangle.getPosition() + Vector2f({ padding_left,padding_top }) + Vector2f({0,-6}) ;
+        text.setPosition(position);
     }
 
     void setText(string str)
@@ -1337,8 +1339,8 @@ int main()
     
     
     
-    ButonDictionar["saveLists"] = new Buton({ 1240,0 }, { 100,50 }, Language[limba]["saveLists"], "saveListsBtn");
-    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 100,50 }, Language[limba]["loadLists"], "loadListsBtn");
+    ButonDictionar["saveLists"] = new Buton({ 1220,0 }, { 120,50 }, Language[limba]["saveLists"], "saveListsBtn");
+    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 120,50 }, Language[limba]["loadLists"], "loadListsBtn");
 
     ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, Language[limba]["ti_addNodePos"], "ti_addNodePos");
     ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, Language[limba]["ti_addNodeData"], "ti_addNodeData");
