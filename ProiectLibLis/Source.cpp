@@ -215,7 +215,7 @@ private:
 
     void updateTextPosition()
     {
-        text.setPosition({ position.x - (text.getLocalBounds().width / 2) - 0, position.y - (text.getLocalBounds().height / 2) - 10 });
+        text.setPosition({ position.x - (text.getLocalBounds().width / 2) - 0, position.y - (text.getLocalBounds().height / 2) - 5 });
         below_text.setPosition({ position.x - (below_text.getLocalBounds().width / 2) - 0, position.y - (below_text.getLocalBounds().height / 2) + 30 });
     }
 
@@ -232,6 +232,7 @@ public:
 
         text.setString(value);
         text.setFont(font);
+        text.setCharacterSize(23);
         
         below_text.setFillColor(Color::Black);
 
@@ -340,7 +341,6 @@ private:
 
     Text text;
     string info;
-    int text_width, text_height;
 
 public:
     /// constructorul pentru buton
@@ -373,8 +373,8 @@ public:
 
         text.setString(value);
         text.setFont(font);
-        text_width = text.getLocalBounds().width;
-        text_height = text.getLocalBounds().height;
+        text.setCharacterSize(24);
+
         updateTextPosition();
 
         Elements.push_back(this);
@@ -394,9 +394,8 @@ public:
     // cu asta recalculez pozitia textului din element
     void updateTextPosition()
     {
-        text.setCharacterSize(24);
-        text_width = text.getLocalBounds().width;
-        text_height = text.getLocalBounds().height;
+        float text_width = text.getLocalBounds().width;
+        float text_height = text.getLocalBounds().height;
         float padding_left = (rectangle.getSize().x - text_width) / 2;
         float padding_top = (rectangle.getSize().y - text_height) / 2;
         Vector2f position = rectangle.getPosition() + Vector2f({ padding_left,padding_top }) + Vector2f({0,-6}) ;
