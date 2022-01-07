@@ -34,8 +34,6 @@ unordered_map < string, Buton* > ButonDictionar;
 
 unordered_map < string, unordered_map < string, string > > Language;
 string limba = "en";
-//string limba_aleasa = "engleza";
-/// EXEMPLU: Language[ limba_aleasa ]["cuvant"] = "word";
 
 void words() {
     Language["en"]["sll"] = "Singly Linked List";
@@ -1052,6 +1050,7 @@ void switchLanguage(string lang) {
         ButonDictionar["ti_addNodeData"]->setText(Language["en"]["ti_addNodeData"]);
 
         ButonDictionar["languageBtn"]->setText("en");
+        limba = "en";
     }
     if (lang == "en") {
         ButonDictionar["sllBtn"]->setText(Language["ro"]["sll"]);
@@ -1080,6 +1079,7 @@ void switchLanguage(string lang) {
         ButonDictionar["ti_addNodeData"]->setText(Language["ro"]["ti_addNodeData"]);
 
         ButonDictionar["languageBtn"]->setText("ro");
+        limba = "ro";
     }
 }
 
@@ -1112,47 +1112,47 @@ void resolveCustomEvents()
                 if (optionForDS == "SLL")
                 {
 
-                    if (isPositiveNumber(pos) && val != "Value") {
+                    if (isPositiveNumber(pos) && val != Language[limba]["ti_addNodeData"]) {
                         SLL.pushNode(val, stoi(pos));
                     }
-                    else if (val != "Value")
+                    else if (val != Language[limba]["ti_addNodeData"])
                     {
                         SLL.pushBack(val);
 
                     }
-                    else if (isPositiveNumber(pos))
+                    /*else if (isPositiveNumber(pos))
                     {
                         SLL.pushNode(to_string(NodesSLL.size()),stoi(pos));
                     }
                     else
                     {
                         SLL.pushBack(to_string(NodesSLL.size()));
-                    }
+                    }*/
                 }
                 //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
                 else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
                 {
-                    if (isPositiveNumber(pos) && val != "Value") {
+                    if (isPositiveNumber(pos) && val != Language[limba]["ti_addNodeData"]) {
                         DLL.pushNode(val, stoi(pos));
                     }
-                    else if (val != "Value")
+                    else if (val != Language[limba]["ti_addNodeData"])
                     {
                         DLL.pushBack(val);
 
                     }
-                    else if (isPositiveNumber(pos))
+                    /*else if (isPositiveNumber(pos))
                     {
                         DLL.pushNode(to_string(NodesDLL.size()), stoi(pos));
                     }
                     else
                     {
                         DLL.pushBack(to_string(NodesDLL.size()));
-                    }
+                    }*/
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
-                ButonDictionar["ti_addNodeData"]->setText("Value");
-                ButonDictionar["ti_addNodePos"]->setText("Position");
+                ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+                ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
 
             }
         }
@@ -1166,7 +1166,7 @@ void resolveCustomEvents()
                 val = ButonDictionar["ti_addNodeData"]->getText();
                 if (optionForDS == "Q")
                 {
-                    if (val != "Value")
+                    if (val != Language[limba]["ti_addNodeData"])
                     {
                         Q.pushBack(val);
                     }
@@ -1175,7 +1175,7 @@ void resolveCustomEvents()
                 }
                 if (optionForDS == "S")
                 {
-                    if (val != "Value")
+                    if (val != Language[limba]["ti_addNodeData"])
                     {
                         S.pushFront(val);
                     }
@@ -1183,7 +1183,9 @@ void resolveCustomEvents()
                         S.pushFront(to_string(NodesStack.size())); 
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
-                ButonDictionar["ti_addNodeData"]->setText("Value");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+                ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
             }
         }
         else if (id == "pushFrontBtn")
@@ -1194,19 +1196,21 @@ void resolveCustomEvents()
                 val = ButonDictionar["ti_addNodeData"]->getText();
                 if (optionForDS == "SLL")
                 {
-                    if (val != "Value") SLL.pushFront(val);
+                    if (val != Language[limba]["ti_addNodeData"]) SLL.pushFront(val);
                     else
                         SLL.pushFront(to_string(NodesSLL.size()));
                 }
                 //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
                 else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
                 {
-                    if (val != "Value") DLL.pushFront(val);
+                    if (val != Language[limba]["ti_addNodeData"]) DLL.pushFront(val);
                     else
                         DLL.pushFront(to_string(NodesDLL.size()));
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
-                ButonDictionar["ti_addNodeData"]->setText("Value");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+                ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
             }
         }
         else if (id == "pushBackBtn")
@@ -1217,19 +1221,21 @@ void resolveCustomEvents()
                 val = ButonDictionar["ti_addNodeData"]->getText();
                 if (optionForDS == "SLL")
                 {
-                    if (val != "Value") SLL.pushBack(val);
+                    if (val != Language[limba]["ti_addNodeData"]) SLL.pushBack(val);
                     else
                         SLL.pushBack(to_string(NodesSLL.size()));
                 }
                 //if (optionForDS == "SLL") SLL.pushNode(to_string(NodesSLL.size()), NodesSLL.size());
                 else  if (optionForDS == "DLL") /*DLL.pushNode(to_string(NodesDLL.size()),NodesDLL.size());*/
                 {
-                    if (val != "Value") DLL.pushBack(val);
+                    if (val != Language[limba]["ti_addNodeData"]) DLL.pushBack(val);
                     else
                         DLL.pushBack(to_string(NodesDLL.size()));
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
-                ButonDictionar["ti_addNodeData"]->setText("Value");
+                ButonDictionar["ti_addNodePos"]->handleTextInput("");
+                ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+                ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
             }
         }
         else if (id == "delNodeBtn")
@@ -1262,8 +1268,8 @@ void resolveCustomEvents()
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
-                ButonDictionar["ti_addNodeData"]->setText("Value");
-                ButonDictionar["ti_addNodePos"]->setText("Position");
+                ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+                ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
             }
         }
         else if (id == "popNodeBtn")
@@ -1274,6 +1280,10 @@ void resolveCustomEvents()
 
                 if (optionForDS == "S") S.popFront();
             }
+            ButonDictionar["ti_addNodeData"]->handleTextInput("");
+            ButonDictionar["ti_addNodePos"]->handleTextInput("");
+            ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+            ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
         }
         else if (id == "popFrontBtn")
         {
@@ -1283,6 +1293,10 @@ void resolveCustomEvents()
 
                 if (optionForDS == "DLL")   DLL.popFront();
             }
+            ButonDictionar["ti_addNodeData"]->handleTextInput("");
+            ButonDictionar["ti_addNodePos"]->handleTextInput("");
+            ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+            ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
         }
         else if (id == "popBackBtn")
         {
@@ -1292,6 +1306,10 @@ void resolveCustomEvents()
 
                 if (optionForDS == "DLL")   DLL.popBack();
             }
+            ButonDictionar["ti_addNodeData"]->handleTextInput("");
+            ButonDictionar["ti_addNodePos"]->handleTextInput("");
+            ButonDictionar["ti_addNodeData"]->setText(Language[limba]["ti_addNodeData"]);
+            ButonDictionar["ti_addNodePos"]->setText(Language[limba]["ti_addNodePos"]);
         }
         else if (id == "sllBtn")
         {
@@ -1486,34 +1504,7 @@ int main()
     Element* target = nullptr;
     bool press = false;
     string ti_input;
-    /*ListSLL sll;
-    ListDLL dll;
-    ListStack stack;
-    ListQueue queue;*/
-    /*sll.addNode("sll1", 0);
-    sll.addNode("sll2", 1);
-    sll.addNode("sll3", 2);
-    sll.addNode("sll4", 3);
-    sll.printList("sll");
-
-    dll.addNode("dll1", 0);
-    dll.addNode("dll2", 1);
-    dll.addNode("dll3", 2);
-    dll.addNode("dll4", 3);
-    dll.printList("dll");
-
-    stack.push("stack1");
-    stack.push("stack2");
-    stack.push("stack3");
-    stack.printStack();
-
-    queue.push("queue1");
-    queue.push("queue2");
-    queue.push("queue3");
-    queue.printQueue();*/
-
-    if (NodesSLL.empty()) cout << "sll is empty";
-
+    
     while (window.isOpen())
     {
         /// aici rezolv logica interfetei
