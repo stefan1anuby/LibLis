@@ -5,6 +5,7 @@
 #include <queue>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 #include "Operatii_liste.h"
 
 using namespace sf;
@@ -13,6 +14,8 @@ using namespace std;
 #define FRAME_INTERVAL 15
 #define WIDTH_SCREEN 1500
 #define HEIGHT_SCREEN 800
+
+mutex m;
 
 ContextSettings settings;
 Font font;
@@ -38,22 +41,22 @@ string limba = "en";
 /// EXEMPLU: Language[ limba_aleasa ]["cuvant"] = "word";
 
 void words() {
-    Language["en"]["sll"] = "Singly Linked List";
-    Language["en"]["dll"] = "Doubly Linked List";
-    Language["en"]["stack"] = "Stack";
-    Language["en"]["queue"] = "Queue";
+    Language["en"]["sllBtn"] = "Singly Linked List";
+    Language["en"]["dllBtn"] = "Doubly Linked List";
+    Language["en"]["stackBtn"] = "Stack";
+    Language["en"]["queueBtn"] = "Queue";
 
-    Language["en"]["newList"] = "New List";
+    Language["en"]["newListBtn"] = "New List";
 
-    Language["en"]["addNode"] = "Add";
-    Language["en"]["pushNode"] = "Push";
-    Language["en"]["pushFront"] = "+Front";
-    Language["en"]["pushBack"] = "+Back";
+    Language["en"]["addNodeBtn"] = "Add";
+    Language["en"]["pushNodeBtn"] = "Push";
+    Language["en"]["pushFrontBtn"] = "+Front";
+    Language["en"]["pushBackBtn"] = "+Back";
 
-    Language["en"]["delNode"] = "Delete";
-    Language["en"]["popNode"] = "Pop";
-    Language["en"]["popFront"] = "-Front";
-    Language["en"]["popBack"] = "-Back";
+    Language["en"]["delNodeBtn"] = "Delete";
+    Language["en"]["popNodeBtn"] = "Pop";
+    Language["en"]["popFrontBtn"] = "-Front";
+    Language["en"]["popBackBtn"] = "-Back";
 
     Language["en"]["saveLists"] = "Save";
     Language["en"]["loadLists"] = "Load";
@@ -61,28 +64,38 @@ void words() {
     Language["en"]["ti_addNodePos"] = "Position";
     Language["en"]["ti_addNodeData"] = "Value";
 
-    Language["ro"]["sll"] = "Lista Simplu Inlantuita";
-    Language["ro"]["dll"] = "Lista Dublu Inlantuita";
-    Language["ro"]["stack"] = "Stiva";
-    Language["ro"]["queue"] = "Coada";
+    Language["en"]["slowUp"] = "Slow up";
+    Language["en"]["speedUp"] = "Speed up";
 
-    Language["ro"]["newList"] = "Lista noua";
+    Language["en"]["languageBtn"] = "en";
 
-    Language["ro"]["addNode"] = "Adauga";
-    Language["ro"]["pushNode"] = "Push";
-    Language["ro"]["pushFront"] = "+Fata";
-    Language["ro"]["pushBack"] = "+Coada";
+    Language["ro"]["sllBtn"] = "Lista Simplu Inlantuita";
+    Language["ro"]["dllBtn"] = "Lista Dublu Inlantuita";
+    Language["ro"]["stackBtn"] = "Stiva";
+    Language["ro"]["queueBtn"] = "Coada";
 
-    Language["ro"]["delNode"] = "Sterge";
-    Language["ro"]["popNode"] = "Pop";
-    Language["ro"]["popFront"] = "-Fata";
-    Language["ro"]["popBack"] = "-Coada";
+    Language["ro"]["newListBtn"] = "Lista noua";
+
+    Language["ro"]["addNodeBtn"] = "Adauga";
+    Language["ro"]["pushNodeBtn"] = "Push";
+    Language["ro"]["pushFrontBtn"] = "+Fata";
+    Language["ro"]["pushBackBtn"] = "+Coada";
+
+    Language["ro"]["delNodeBtn"] = "Sterge";
+    Language["ro"]["popNodeBtn"] = "Pop";
+    Language["ro"]["popFrontBtn"] = "-Fata";
+    Language["ro"]["popBackBtn"] = "-Coada";
 
     Language["ro"]["saveLists"] = "Salvare";
     Language["ro"]["loadLists"] = "Incarcare";
 
     Language["ro"]["ti_addNodePos"] = "Pozitie";
     Language["ro"]["ti_addNodeData"] = "Valoare";
+
+    Language["ro"]["slowUp"] = "Scade";
+    Language["ro"]["speedUp"] = "Creste";
+
+    Language["ro"]["languageBtn"] = "ro";
 }
 
 
@@ -214,9 +227,18 @@ private:
 
     void updateTextPosition()
     {
-        text.setPosition({ position.x - (text.getLocalBounds().width / 2) - 0, position.y - (text.getLocalBounds().height / 2) - 5 });
-        below_text.setPosition({ position.x - (below_text.getLocalBounds().width / 2) - 0, position.y - (below_text.getLocalBounds().height / 2) + 30 });
-        onTop_text.setPosition({ position.x - (onTop_text.getLocalBounds().width / 2) - 0, position.y - (onTop_text.getLocalBounds().height / 2) - 50 });
+        try
+        {
+            text.setPosition( (int) (position.x - (text.getLocalBounds().width / 2) - 0) , (int) (position.y - (text.getLocalBounds().height / 2) - 5 ) );
+            below_text.setPosition((int) (position.x - (below_text.getLocalBounds().width / 2) - 0 ), (int) (position.y - (below_text.getLocalBounds().height / 2) + 30 ) );
+            onTop_text.setPosition( (int)  (position.x - (onTop_text.getLocalBounds().width / 2) - 0 ), (int) (position.y - (onTop_text.getLocalBounds().height / 2) - 50 ) );
+
+        }
+        catch (const std::exception& e)
+        {
+            cout << e.what() << endl;
+        }
+
     }
 
 public:
@@ -235,6 +257,7 @@ public:
         text.setCharacterSize(23);
         
         below_text.setFillColor(Color::Black);
+        below_text.setCharacterSize(20);
         onTop_text.setFillColor(Color::Black);
 
         updateTextPosition();
@@ -261,7 +284,7 @@ public:
     void setCenterCoordinates(Vector2f point)
     {
         position = point;
-        circle.setPosition(point.x - circle.getRadius(), point.y - circle.getRadius());
+        circle.setPosition((int) (point.x - circle.getRadius() ),(int) (point.y - circle.getRadius()) );
         updateTextPosition();
     }
 
@@ -291,6 +314,7 @@ public:
     /// metoda ce este chemata automat atunci cand elementul este desenat
     void draw(RenderTarget& target, RenderStates states) const
     {
+        
         if (isDisplayed)
         {
             target.draw(circle, states);
@@ -298,6 +322,7 @@ public:
             target.draw(below_text, states);
             target.draw(onTop_text, states);
         }
+       
     }
 
     /// ca sa schimbi culoarea nodului
@@ -324,9 +349,17 @@ public:
  
     void setTextBelow(string str)
     {
-        below_text.setString(str);
-        below_text.setFont(font);
-        updateTextPosition();
+        try
+        {
+
+            below_text.setString(str);
+            below_text.setFont(font);
+            updateTextPosition();
+        }
+        catch (const std::exception& e)
+        {
+            cout << e.what() << endl;
+        }
     }
     void setTextBelowColor(Color color)
     {
@@ -527,6 +560,7 @@ void animations()
     {
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
+            m.lock();
             /// aici pot modifica timpul de incepere al unei animatii anume
             while (!requestForAnimation.empty())
             {
@@ -552,6 +586,7 @@ void animations()
                     }
                 }
             }
+            m.unlock();
 
             timeSnapshot = myClock.getElapsedTime();
         }
@@ -571,8 +606,10 @@ void updateScreen(RenderWindow* window)
         if (myClock.getElapsedTime() - timeSnapshot > time_interval)
         {
             //window->clear(Color::White);
-            window->clear(sf::Color(39 * 25, 39 * 25, 39 * 25 ));
+            window->clear(Color(39.0 * 25, 39.0 * 25, 39.0 * 25 ));
             
+            m.lock();
+
             try
             {
                 // aici desenez legaturile dintre noduri
@@ -595,6 +632,10 @@ void updateScreen(RenderWindow* window)
                     if (counter == 0) {
                         (*element).setBorder(3, Color::Black);
                         (*element).setTextOnTop("head");
+                    }
+                    else if (counter == copyNodesSLL.size() - 1) {
+                        (*element).setBorder(3, Color::Black);
+                        (*element).setTextOnTop("tail");
                     }
                     else
                     {
@@ -619,7 +660,7 @@ void updateScreen(RenderWindow* window)
 
                         float dist = distanceBetweenTwoPoints(pos1, pos2);
                         /// de terminat
-                       if (dist < 230.0)
+                       if (dist < 225.0)
                         {
                            ConvexShape ar = getArrow(pos1 + orientation1, pos2 + orientation2, "line", width);
                            ConvexShape ar2 = getArrow(pos1 + orientation1, pos2 + orientation2, "sharp", width, arrowSize);
@@ -645,8 +686,8 @@ void updateScreen(RenderWindow* window)
                         (*element).setTextOnTop("head");
                     }
                     else if (counter == copyNodesDLL.size() - 1) {
-                        (*element).setBorder(3, Color::Black);
-                        (*element).setTextOnTop("tail");
+                       (*element).setBorder(3, Color::Black);
+                       (*element).setTextOnTop("tail");
                     }
                     else
                     {
@@ -730,17 +771,21 @@ void updateScreen(RenderWindow* window)
 
                 last = nullptr;
                 counter = 0;
-
+                
                 for (auto element : copyNodesQueue)
                 {
                     //window->draw(*element);
                     if (counter == 0) {
+                       (*element).setBorder(3, Color::Black);
+                       (*element).setTextOnTop("front");
+                    }
+                    else if (counter == copyNodesQueue.size() - 1) {
                         (*element).setBorder(3, Color::Black);
-                        (*element).setTextOnTop("front");
+                        (*element).setTextOnTop("tail");
                     }
                     else
                     {
-                        (*element).setBorder(0, Color::Black);
+                       (*element).setBorder(0, Color::Black);
                         (*element).setTextOnTop("");
                     }
 
@@ -798,6 +843,7 @@ void updateScreen(RenderWindow* window)
                      window->draw(*element);
                 }
 
+
             }
             catch (const std::exception&)
             {
@@ -806,6 +852,7 @@ void updateScreen(RenderWindow* window)
             window->display();
             timeSnapshot = myClock.getElapsedTime();
             //myClock.restart();
+            m.unlock();
         }
     }
 
@@ -823,7 +870,7 @@ private:
     ListDLL dll;
     ListStack stack;
     ListQueue queue;
-    Time speed = seconds(1.5);
+    Time speed = seconds(0.5);
 
     void update()
     {
@@ -845,16 +892,52 @@ public:
         columns = col;
         ds_type = type_ds;
     };
-    void pushNode(string val , int position)
+    void pushNode(string val, int position, bool save = true)
     {
-        if (ds_type == "sll")   sll.addNode(val, position);
-        if (ds_type == "dll")   dll.addNode(val, position);
-        //int counter = (*Vector).size();
-        if (position > (*Vector).size()) position = (*Vector).size();
-        Node* nod = new Node(nodeSpawn_position, 25, val , "node" + ds_type + val, ds_type);
-        (*Vector).insert((*Vector).begin() + position,nod);
-        sleep(speed);
-        update();
+        if (save == true)
+        {
+
+            if (ds_type == "sll")   sll.addNode(val, position);
+            if (ds_type == "dll")   dll.addNode(val, position);
+        }
+        int len = (*Vector).size();
+        if (position > len) position = len;
+        if (position == 0) pushFront(val, save = false);
+        else if (position == len) pushBack(val, save = false);
+        else
+        {
+            (*Vector).front()->setTextBelow("Node pred = head");
+
+            for (int i = 0; i < position - 1; i++)
+            {
+                (*Vector)[i]->setColor(Color::Cyan);
+                (*Vector)[i]->setTextBelow("for (cnt = 0; cnt < position - 1 ;cnt++)");
+                sleep(speed * float(0.5));
+                (*Vector)[i]->setTextBelow("// cnt = " + to_string(i));
+                sleep(speed * float(0.5));
+                (*Vector)[i]->setTextBelow("pred = pred.next");
+                sleep(speed * float(0.5));
+                (*Vector)[i]->setColor(Color::Red);
+                (*Vector)[i]->setTextBelow("");
+            }
+            (*Vector)[position - 1]->setColor(Color::Cyan);
+            (*Vector)[position - 1]->setTextBelow("Node after = pred.next");
+            sleep(speed);
+            (*Vector)[position - 1]->setTextBelow("");
+
+            Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
+            (*Vector).insert((*Vector).begin() + position, nod);
+            nod->setTextBelow("Node node = new Node");
+            sleep(speed * 2.f);
+            nod->setTextBelow("node.next = after");
+            sleep(speed);
+            (*Vector)[position - 1]->setTextBelow("pred.next = node");
+            nod->setTextBelow("");
+            sleep(speed);
+            (*Vector)[position - 1]->setTextBelow("");
+            (*Vector)[position - 1]->setColor(Color::Red);
+            update();
+        }
     }
     void pushFromFile(string val) {
         int counter = (*Vector).size();
@@ -863,90 +946,244 @@ public:
         sleep(speed);
         update();
     }
-    void pushBack(string val)
+    void pushBack(string val, bool save = true)
     {
-        if (ds_type == "sll")   sll.addNode(val, sll.length);
-        if (ds_type == "dll")   dll.addNode(val, dll.length);
-        if (ds_type == "s")     stack.addNode(val, stack.length);
-        if (ds_type == "q")     queue.addNode(val, queue.length);
+        if (save == true)
+        {
+
+            if (ds_type == "sll")   sll.addNode(val, sll.length);
+            if (ds_type == "dll")   dll.addNode(val, dll.length);
+            if (ds_type == "s")     stack.addNode(val, stack.length);/* stack.push(val);*/
+            if (ds_type == "q")     queue.addNode(val, queue.length);
+        }
+
+
         int counter = (*Vector).size();
+
+        /// de pus else if pentru dll
+
+
         Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
         (*Vector).insert((*Vector).begin() + counter, nod);
-        sleep(speed);
-        update();
-    }
-    void pushFront(string val)
-    {
-        if (ds_type == "sll")   sll.addNode(val, 0);
-        if (ds_type == "dll")   dll.addNode(val, 0);
-        if (ds_type == "s")     stack.addNode(val, 0);
-        if (ds_type == "q")     queue.addNode(val, 0);
-        Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
-        (*Vector).insert((*Vector).begin() , nod);
-        sleep(speed);
-        update();
-    }
 
-    void popBack()
-    {
-        if (ds_type == "sll")   sll.deleteNode(sll.length);
-        if (ds_type == "dll")   dll.deleteNode(dll.length);
-        if (ds_type == "s")     stack.deleteNode(stack.length);
-        if (ds_type == "q")     queue.deleteNode(queue.length);
-        (*Vector).back()->setColor(Color::Green);
-        (*Vector).back()->setTextBelow("back");
-        sleep(speed);
-        (*Vector).back()->setTextBelow("delete");
-        (*Vector).back()->setTextBelowColor(Color::Red);
-        sleep(speed);
-        (*Vector).pop_back();
-        update();
-    }
-
-    void popFront()
-    {
-        if (ds_type == "sll")   sll.deleteNode(0);
-        if (ds_type == "dll")   dll.deleteNode(0);
-        if (ds_type == "s")     stack.deleteNode(0);
-        if (ds_type == "q")     queue.deleteNode(0);
-        (*Vector).front()->setColor(Color::Green);
-        (*Vector).front()->setTextBelow("front");
-        sleep(speed);
-        (*Vector).front()->setTextBelow("delete");
-        (*Vector).front()->setTextBelowColor(Color::Red);
-        sleep(speed);
-        (*Vector).erase((*Vector).begin());
-        update();
-    }
-
-    void deleteNode(int counter)
-    {
-        if (ds_type == "sll")   sll.deleteNode(counter);
-        if (ds_type == "dll")   dll.deleteNode(counter);
-        if (counter > (*Vector).size()) counter = (*Vector).size() - 1;
-        for(int i=0 ; i <= counter ; i++)
+        // background color
+        nod->setTextBelow("Node node = new Node");
+        nod->setTextOnTopColor(Color(39.0 * 25, 39.0 * 25, 39.0 * 25));
+        if (counter > 0)
         {
-            (*Vector)[i]->setColor(Color::Blue);
-            (*Vector)[i]->setTextBelow("iter");
             sleep(speed);
-            if (i < counter) 
-            { 
-                (*Vector)[i]->setTextBelow("index < " +to_string(counter));
-                sleep(speed);
-                (*Vector)[i]->setTextBelow("iter = iter -> next");
-                sleep(speed); 
-            }
-            (*Vector)[i]->setColor(Color::Red);
-            (*Vector)[i]->setTextBelow("");
+            nod->setTextBelow("");
+            (*Vector)[counter - 1]->setTextBelow("tail.next = node");
+            sleep(speed);
+            (*Vector)[counter - 1]->setTextBelow("");
+
+
         }
-        (*Vector)[counter]->setTextBelow("index == " + to_string(counter));
+        else if (counter == 0)
+        {
+            sleep(speed);
+            string temp = "head";
+            if (ds_type == "q") temp = "front";
+            nod->setTextBelow(temp + " = node");
+            sleep(speed);
+        }
+        nod->setTextBelow("tail = node");
         sleep(speed);
-        (*Vector)[counter]->setTextBelow("delete");
-        (*Vector)[counter]->setColor(Color::Green);
-        (*Vector)[counter]->setTextBelowColor(Color::Blue);
+        nod->setTextOnTopColor(Color::Black);
         sleep(speed);
-        (*Vector).erase((*Vector).begin()+counter);
+        nod->setTextBelow("");
         update();
+
+
+    }
+    void pushFront(string val, bool save = true)
+    {
+        if (save == true)
+        {
+
+            if (ds_type == "sll")   sll.addNode(val, 0);
+            if (ds_type == "dll")   dll.addNode(val, 0);
+            if (ds_type == "s")     stack.addNode(val, 0);
+            if (ds_type == "q")     queue.addNode(val, 0);
+        }
+        Node* nod = new Node(nodeSpawn_position, 25, val, "node" + ds_type + val, ds_type);
+        (*Vector).insert((*Vector).begin(), nod);
+
+        // background color
+        nod->setTextOnTopColor(Color(39.0 * 25, 39.0 * 25, 39.0 * 25));
+
+        string temp = "head";
+        int size = (*Vector).size();
+        if (ds_type == "s") temp = "top";
+
+        nod->setTextBelow("Node node = new Node");
+        sleep(speed);
+        if (size > 1)
+        {
+            nod->setTextBelow("node.next = " + temp);
+            sleep(speed);
+
+        }
+        nod->setTextBelow(temp + " = node");
+        sleep(speed);
+        if (size == 1)
+        {
+            nod->setTextBelow("tail = node");
+            sleep(speed);
+        }
+        nod->setTextOnTopColor(Color::Black);
+        nod->setTextBelow("");
+        update();
+    }
+
+    void popBack(bool save = true)
+    {
+        int size = (*Vector).size();
+        if (size > 0)
+        {
+
+            if (save == true)
+            {
+
+                if (ds_type == "sll")   sll.deleteNode(sll.length);
+                if (ds_type == "dll")   dll.deleteNode(dll.length);
+                if (ds_type == "s")     stack.deleteNode(stack.length);
+                if (ds_type == "q")     queue.deleteNode(queue.length);
+            }
+
+            if (ds_type == "sll")
+            {
+                deleteNode((*Vector).size() - 1, save = false);
+            }
+            else if (ds_type == "dll")
+            {
+                (*Vector).back()->setColor(Color::Green);
+                (*Vector).back()->setTextBelow("Node del = tail");
+                sleep(speed);
+                (*Vector).back()->setTextBelow("tail = tail.pred, delete del");
+                sleep(speed);
+                (*Vector).pop_back();
+                update();
+                (*Vector).back()->setTextBelow("tail.next = null");
+                sleep(speed);
+                (*Vector).back()->setTextBelow("");
+            }
+            else
+            {
+
+
+            }
+        }
+    }
+
+    void popFront(bool save = true)
+    {
+        int size = (*Vector).size();
+        if (size > 0)
+        {
+
+            if (save == true)
+            {
+
+                if (ds_type == "sll")   sll.deleteNode(0);
+                if (ds_type == "dll")   dll.deleteNode(0);
+                if (ds_type == "s")     stack.deleteNode(0);
+                if (ds_type == "q")     queue.deleteNode(0);
+            }
+            string temp = "head";
+            if (ds_type == "q") temp = "front";
+            else if (ds_type == "s") temp = "top";
+            if (size == 1)
+            {
+                (*Vector).front()->setColor(Color::Green);
+                (*Vector).front()->setTextBelow(temp);
+                sleep(speed);
+                (*Vector).front()->setTextBelow("delete");
+                (*Vector).front()->setTextBelowColor(Color::Red);
+                sleep(speed);
+                (*Vector).erase((*Vector).begin());
+            }
+            else
+            {
+                (*Vector).front()->setTextBelow("Node del = " + temp);
+                sleep(speed);
+                (*Vector).front()->setTextBelow(temp + " = " + temp + ".next , delete del");
+                (*Vector).front()->setColor(Color::Green);
+                (*Vector).front()->setTextOnTopColor(Color(39.0 * 25, 39.0 * 25, 39.0 * 25));
+                sleep(speed);
+                (*Vector).erase((*Vector).begin());
+
+            }
+            update();
+        }
+    }
+
+    void deleteNode(int counter , bool save = true)
+    {
+        int size = (*Vector).size();
+        if (size > 0 && counter >= 0)
+        {
+            if (save == true)
+            {
+
+                if (ds_type == "sll")   sll.deleteNode(counter);
+                if (ds_type == "dll")   dll.deleteNode(counter);
+            }
+
+            if (counter > size) counter = size - 1;
+
+            if (counter == 0) popFront(save=false);
+            else
+            {
+
+                (*Vector)[0]->setTextBelow("Node pred = head");
+                (*Vector)[0]->setColor(Color::Cyan);
+                sleep(speed);
+
+                for(int i=0 ; i < counter-1 ; i++)
+                {
+                    (*Vector)[i]->setColor(Color::Cyan);
+                    (*Vector)[i]->setTextBelow("for (k = 0; k < counter-1; k++)");
+                    sleep(speed);
+                    (*Vector)[i]->setTextBelow("pred = pred.next");
+                    sleep(speed);
+                    (*Vector)[i]->setTextBelow("");
+                    (*Vector)[i]->setColor(Color::Red);
+                    (*Vector)[i]->setTextBelowColor(Color::Black);
+                }
+                (*Vector)[counter - 1]->setColor(Color::Cyan);
+                (*Vector)[counter - 1]->setTextBelow("//pred");
+                sleep(speed);
+                (*Vector)[counter]->setColor(Color::Green);
+                (*Vector)[counter - 1]->setTextBelow("");
+                (*Vector)[counter]->setTextBelow("Node del = pred.next");
+                sleep(speed);
+                (*Vector)[counter]->setTextBelow("");
+                if (counter == size - 1)
+                {
+                    (*Vector)[counter - 1]->setTextBelow("pred.next = null");
+                    sleep(speed);
+                    (*Vector)[counter - 1]->setTextBelow("delete del , tail = pred");
+                    sleep(speed);
+                }
+                else
+                {
+
+                    (*Vector)[counter]->setTextBelow("Node after = del.next");
+                    sleep(speed);
+                    (*Vector)[counter]->setTextBelow("");
+                    (*Vector)[counter - 1]->setTextBelow("pred.next = after");
+                    sleep(speed * 0.5f);
+                    (*Vector)[counter - 1]->setTextBelow("");
+                    (*Vector)[counter]->setTextBelow("delete del");
+                    sleep(speed);
+                }
+                (*Vector)[counter - 1]->setColor(Color::Red);
+                (*Vector)[counter - 1]->setTextBelow("");
+                (*Vector).erase((*Vector).begin()+counter);
+                update();
+            }
+        }
     }
 
     void deleteNode(Node* nod)
@@ -1017,69 +1254,33 @@ public:
             }
         }
     }
+
+    void speedDown()
+    {
+        if(speed < seconds(4))
+            speed = speed + seconds(0.25);
+    }
+    void speedUp()
+    {
+        if(speed > seconds(0.5))
+            speed = speed - seconds(0.25);
+    }
 };
 
-DataStructureVisualizer SLL({ 100,300 }, 3, &NodesSLL);
-DataStructureVisualizer DLL({ 450,300 }, 3, &NodesDLL, "dll");
-DataStructureVisualizer S({ 850,300 }, 1, &NodesStack, "s");
-DataStructureVisualizer Q({ 1100,300 }, 1, &NodesQueue, "q");
+DataStructureVisualizer SLL({ 100,320 }, 3, &NodesSLL);
+DataStructureVisualizer DLL({ 450,320 }, 3, &NodesDLL, "dll");
+DataStructureVisualizer S({ 850,320 }, 1, &NodesStack, "s");
+DataStructureVisualizer Q({ 1100,320 }, 1, &NodesQueue, "q");
 
 void switchLanguage(string lang) {
-    if (lang == "ro") {
-        ButonDictionar["sllBtn"]->setText(Language["en"]["sll"]);
-        ButonDictionar["dllBtn"]->setText(Language["en"]["dll"]);
-        ButonDictionar["stackBtn"]->setText(Language["en"]["stack"]);
-        ButonDictionar["queueBtn"]->setText(Language["en"]["queue"]);
-
-        ButonDictionar["newListBtn"]->setText(Language["en"]["newList"]);
-
-        ButonDictionar["addNodeBtn"]->setText(Language["en"]["addNode"]);
-        ButonDictionar["pushNodeBtn"]->setText(Language["en"]["pushNode"]);
-        ButonDictionar["pushFrontBtn"]->setText(Language["en"]["pushFront"]);
-        ButonDictionar["pushBackBtn"]->setText(Language["en"]["pushBack"]);
-
-        ButonDictionar["delNodeBtn"]->setText(Language["en"]["delNode"]);
-        ButonDictionar["popNodeBtn"]->setText(Language["en"]["popNode"]);
-        ButonDictionar["popFrontBtn"]->setText(Language["en"]["popFront"]);
-        ButonDictionar["popBackBtn"]->setText(Language["en"]["popBack"]);
-
-
-
-        ButonDictionar["saveLists"]->setText(Language["en"]["saveLists"]);
-        ButonDictionar["loadLists"]->setText(Language["en"]["loadLists"]);
-
-        ButonDictionar["ti_addNodePos"]->setText(Language["en"]["ti_addNodePos"]);
-        ButonDictionar["ti_addNodeData"]->setText(Language["en"]["ti_addNodeData"]);
-
-        ButonDictionar["languageBtn"]->setText("en");
-    }
-    if (lang == "en") {
-        ButonDictionar["sllBtn"]->setText(Language["ro"]["sll"]);
-        ButonDictionar["dllBtn"]->setText(Language["ro"]["dll"]);
-        ButonDictionar["stackBtn"]->setText(Language["ro"]["stack"]);
-        ButonDictionar["queueBtn"]->setText(Language["ro"]["queue"]);
-
-        ButonDictionar["newListBtn"]->setText(Language["ro"]["newList"]);
-
-        ButonDictionar["addNodeBtn"]->setText(Language["ro"]["addNode"]);
-        ButonDictionar["pushNodeBtn"]->setText(Language["ro"]["pushNode"]);
-        ButonDictionar["pushFrontBtn"]->setText(Language["ro"]["pushFront"]);
-        ButonDictionar["pushBackBtn"]->setText(Language["ro"]["pushBack"]);
-
-        ButonDictionar["delNodeBtn"]->setText(Language["ro"]["delNode"]);
-        ButonDictionar["popNodeBtn"]->setText(Language["ro"]["popNode"]);
-        ButonDictionar["popFrontBtn"]->setText(Language["ro"]["popFront"]);
-        ButonDictionar["popBackBtn"]->setText(Language["ro"]["popBack"]);
-
-
-
-        ButonDictionar["saveLists"]->setText(Language["ro"]["saveLists"]);
-        ButonDictionar["loadLists"]->setText(Language["ro"]["loadLists"]);
-
-        ButonDictionar["ti_addNodePos"]->setText(Language["ro"]["ti_addNodePos"]);
-        ButonDictionar["ti_addNodeData"]->setText(Language["ro"]["ti_addNodeData"]);
-
-        ButonDictionar["languageBtn"]->setText("ro");
+    if (lang == "ro") lang = "en";
+    else if (lang == "en") lang = "ro";
+    if(lang=="ro" || lang=="en")
+    { 
+        for (auto& buton : ButonDictionar)
+        {
+            buton.second->setText(Language[lang][buton.first]);
+        }
     }
 }
 
@@ -1314,6 +1515,9 @@ void resolveCustomEvents()
                 ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
 
+                ButonDictionar["slowUp"]->makeVisible();
+                ButonDictionar["speedUp"]->makeVisible();
+
                 ButonDictionar["sllBtn"]->setColor(Color::Green);
                 ButonDictionar["dllBtn"]->setColor(Color::Blue);
                 ButonDictionar["stackBtn"]->setColor(Color::Blue);
@@ -1340,6 +1544,9 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeVisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["slowUp"]->makeVisible();
+                ButonDictionar["speedUp"]->makeVisible();
 
                 ButonDictionar["sllBtn"]->setColor(Color::Blue);
                 ButonDictionar["dllBtn"]->setColor(Color::Green);
@@ -1368,6 +1575,9 @@ void resolveCustomEvents()
                 ButonDictionar["ti_addNodePos"]->makeInvisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
 
+                ButonDictionar["slowUp"]->makeVisible();
+                ButonDictionar["speedUp"]->makeVisible();
+
                 ButonDictionar["sllBtn"]->setColor(Color::Blue);
                 ButonDictionar["dllBtn"]->setColor(Color::Blue);
                 ButonDictionar["stackBtn"]->setColor(Color::Green);
@@ -1394,6 +1604,9 @@ void resolveCustomEvents()
 
                 ButonDictionar["ti_addNodePos"]->makeInvisible();
                 ButonDictionar["ti_addNodeData"]->makeVisible();
+
+                ButonDictionar["slowUp"]->makeVisible();
+                ButonDictionar["speedUp"]->makeVisible();
 
                 ButonDictionar["sllBtn"]->setColor(Color::Blue);
                 ButonDictionar["dllBtn"]->setColor(Color::Blue);
@@ -1428,6 +1641,18 @@ void resolveCustomEvents()
                 switchLanguage(ButonDictionar["languageBtn"]->getText());
             }
         }
+        else if (id == "speedUp") {
+            SLL.speedUp();
+            DLL.speedUp();
+            S.speedUp();
+            Q.speedUp();
+        }
+        else if (id == "slowUp") {
+            SLL.speedDown();
+            DLL.speedDown();
+            S.speedDown();
+            Q.speedDown();
+        }
     }
 }
 
@@ -1450,23 +1675,23 @@ int main()
     words();
 
     /// IN LOC SA CREEZ VARIABILE MAI BINE LE PUN IN DICTIONAR DIRECT
-    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, Language[limba]["sll"], "sllBtn");
-    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, Language[limba]["dll"], "dllBtn");
-    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, Language[limba]["stack"], "stackBtn");
-    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, Language[limba]["queue"], "queueBtn");
+    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, Language[limba]["sllBtn"], "sllBtn");
+    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, Language[limba]["dllBtn"], "dllBtn");
+    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, Language[limba]["stackBtn"], "stackBtn");
+    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, Language[limba]["queueBtn"], "queueBtn");
 
-    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, Language[limba]["newList"], "newListBtn");
+    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, Language[limba]["newListBtn"], "newListBtn");
     //ButonDictionar["clearListBtn"] = new Buton({ 1200,700 }, { 290,50 }, "Clear List", "clearListBtn");
 
-    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["addNode"], "addNodeBtn");
-    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["pushNode"], "pushNodeBtn");
-    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, Language[limba]["pushFront"], "pushFrontBtn");
-    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, Language[limba]["pushBack"], "pushBackBtn");
+    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["addNodeBtn"], "addNodeBtn");
+    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["pushNodeBtn"], "pushNodeBtn");
+    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, Language[limba]["pushFrontBtn"], "pushFrontBtn");
+    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, Language[limba]["pushBackBtn"], "pushBackBtn");
    
-    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["delNode"], "delNodeBtn");
-    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["popNode"], "popNodeBtn");
-    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, Language[limba]["popFront"], "popFrontBtn");
-    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, Language[limba]["popBack"], "popBackBtn");
+    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["delNodeBtn"], "delNodeBtn");
+    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["popNodeBtn"], "popNodeBtn");
+    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, Language[limba]["popFrontBtn"], "popFrontBtn");
+    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, Language[limba]["popBackBtn"], "popBackBtn");
     
     
     
@@ -1477,6 +1702,9 @@ int main()
     ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, Language[limba]["ti_addNodeData"], "ti_addNodeData");
 
     ButonDictionar["languageBtn"] = new Buton({ 1400,720 }, { 60,40 }, limba, "languageBtn");
+
+    ButonDictionar["slowUp"] = new Buton({ 50,720 }, { 120,40 }, Language[limba]["slowUp"], "slowUp");
+    ButonDictionar["speedUp"] = new Buton({ 190, 720 }, { 120,40 } , Language[limba]["speedUp"] , "speedUp");
 
 
 
@@ -1512,7 +1740,7 @@ int main()
     queue.push("queue3");
     queue.printQueue();*/
 
-    if (NodesSLL.empty()) cout << "sll is empty";
+    //if (NodesSLL.empty()) cout << "sll is empty";
 
     while (window.isOpen())
     {
