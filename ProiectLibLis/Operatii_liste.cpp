@@ -83,8 +83,10 @@ void ListQueue::push(std::string data) {
 }
 
 void List::deleteNode(unsigned int node_id) {
-	if (node_id > length && first == NULL)
-		node_id = 0;
+	/*if (node_id > length && first == NULL)
+		node_id = 0;*/
+	if (node_id >= length)
+		node_id = length - 1;
 	unsigned int current_node = 0;
 	node* iterator = first;
 	node* prev = NULL;

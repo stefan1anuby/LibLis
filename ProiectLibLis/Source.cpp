@@ -1248,23 +1248,23 @@ void resolveCustomEvents()
 
                 if (optionForDS == "SLL")
                 {
-                    if (isPositiveNumber(pos)) {
+                    if (isPositiveNumber(pos) && !NodesSLL.empty()) {
                         SLL.deleteNode(stoi(pos));
                     }
-                    else
+                    /*else
                     {
                         SLL.popBack();
-                    }
+                    }*/
                 }
                 else if (optionForDS == "DLL") 
                 {
-                    if (isPositiveNumber(pos)) {
+                    if (isPositiveNumber(pos) && !NodesSLL.empty()) {
                         DLL.deleteNode(stoi(pos));
                     }
-                    else
+                    /*else
                     {
                         DLL.popBack();
-                    }
+                    }*/
                 }
                 ButonDictionar["ti_addNodeData"]->handleTextInput("");
                 ButonDictionar["ti_addNodePos"]->handleTextInput("");
