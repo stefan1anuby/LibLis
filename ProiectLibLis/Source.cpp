@@ -1119,7 +1119,7 @@ public:
     void deleteNode(int counter , bool save = true)
     {
         int size = (*Vector).size();
-        if (size > 0 && counter >= 0)
+        if (size > 0 && counter >= 0 && counter < size)
         {
             if (save == true)
             {
@@ -1319,10 +1319,11 @@ void resolveCustomEvents()
                         SLL.pushBack(val);
 
                     }
-                    /*else if (isPositiveNumber(pos))
+                    else if (isPositiveNumber(pos))
                     {
                         SLL.pushNode(to_string(NodesSLL.size()),stoi(pos));
                     }
+                    /*
                     else
                     {
                         SLL.pushBack(to_string(NodesSLL.size()));
@@ -1339,10 +1340,11 @@ void resolveCustomEvents()
                         DLL.pushBack(val);
 
                     }
-                    /*else if (isPositiveNumber(pos))
+                    else if (isPositiveNumber(pos))
                     {
                         DLL.pushNode(to_string(NodesDLL.size()), stoi(pos));
                     }
+                    /*
                     else
                     {
                         DLL.pushBack(to_string(NodesDLL.size()));
