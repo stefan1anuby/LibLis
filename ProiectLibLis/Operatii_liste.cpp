@@ -1,7 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+// Vlad: functiile de prelucrare a valorilor din liste
 #include "Operatii_liste.h";
 
+// creare / golire lista
 void List::emptyList() {
 	/*first = NULL;
 	last = NULL;
@@ -22,6 +24,7 @@ ListQueue::ListQueue() {
 	L.emptyList();
 }
 
+//adaugare noduri in lista
 void List::addNode(std::string data, unsigned int node_id) {
 	node* newnode = new node;
 	newnode->data = data;
@@ -82,6 +85,7 @@ void ListQueue::push(std::string data) {
 	L.addNode(data, L.length);
 }
 
+//stergere noduri din lista
 void List::deleteNode(unsigned int node_id) {
 	if (node_id > length && first == NULL)
 		node_id = 0;
@@ -123,6 +127,7 @@ void ListQueue::pop() {
 	L.deleteNode(0);
 }
 
+//scrie listele in fisier
 void List::printList(std::string dataType) {
 	FILE* output;
 	node* iterator = first;
@@ -165,6 +170,7 @@ void ListQueue::printQueue() {
 	L.printList("q");
 }
 
+//citeste listele din fisier
 void List::readFromFile(std::string dataType) {
 	FILE* input;
 	int read;

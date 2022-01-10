@@ -1,12 +1,7 @@
 #include <iostream>
 #include <string>
 
-/*
-TODO:
-	adaugat empty list la meniu
-	reparat delete sa nu mai dea eroare cand e pe ultimu nod
-	terminat meniu
-*/
+/*Vlad: clasele de la liste*/
 
 
 class node {

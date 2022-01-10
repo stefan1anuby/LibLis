@@ -33,11 +33,12 @@ vector < Node* > NodesDLL;
 vector < Node* > NodesStack;
 vector < Node* > NodesQueue;
 
-unordered_map < string, Buton* > ButonDictionar;
+unordered_map < string, Buton* > ButonDictionar;                        // map pentru toate butoanele
 
-unordered_map < string, unordered_map < string, string > > Language;
+unordered_map < string, unordered_map < string, string > > Language;    // map pentru cuvintele din fiecare limba
 string limba = "en";
 
+// functie care initializeaza toate cuvintele in map
 void words() {
     Language["en"]["sllBtn"] = "Singly Linked List";
     Language["en"]["dllBtn"] = "Doubly Linked List";
@@ -99,8 +100,8 @@ void words() {
 
 
 queue < pair < string, string > > customEvents;
-/// optiunea de structura de date aleasa de utilizator
-string optionForDS;
+
+string optionForDS;                                 /// optiunea de structura de date aleasa de utilizator
 
 /// calculeaza distanta dintre doua puncte la puterea a 2 a
 int DistanceBetweenTwoPointsSquared(Vector2f point1, Vector2f point2)
@@ -184,7 +185,7 @@ ConvexShape getArrow(Vector2f p1, Vector2f p2 , string part = "line" , Vector2f 
 }
 
 
-
+// Stefan: clasa cu proprietatile pentru toate elementele
 class Element : public Drawable, public Transformable
 {
 protected:
@@ -217,12 +218,15 @@ public:
 
 };
 
+
+// Stefan: clasa nodurilor
 class Node : public Element
 {
 private:
     Text text,below_text,onTop_text;
     string info;
 
+    // calculeaza pozitia textului ca sa fie mereu centrat
     void updateTextPosition()
     {
         try
@@ -274,6 +278,7 @@ public:
         */
     }
 
+    // pozitia nodului
     void setPosition(Vector2f point)
     {
         setCenterCoordinates(point);
@@ -329,11 +334,13 @@ public:
         circle.setFillColor(color);
     }
 
+    // returneaza pozitia nodului
     Vector2f getPosition()
     {
         return position;
     }
 
+    // returneaza raza nodului (cercului)
     float getRadius()
     {
         return circle.getRadius();
@@ -344,7 +351,7 @@ public:
         setPosition(position + direction);
     }
 
- 
+    // textul de sub noduri
     void setTextBelow(string str)
     {
         try
@@ -359,21 +366,26 @@ public:
             cout << e.what() << endl;
         }
     }
+    // culoare
     void setTextBelowColor(Color color)
     {
         below_text.setFillColor(color);
     }
+
+    // textul de deasupra nodurilor
     void setTextOnTop(string str)
     {
         onTop_text.setString(str);
         onTop_text.setFont(font);
         updateTextPosition();
     }
+    // culoare
     void setTextOnTopColor(Color color)
     {
         onTop_text.setFillColor(color);
     }
 
+    // conturul cercului
     void setBorder(float thickness, Color color)
     {
         circle.setOutlineThickness(thickness);
@@ -381,7 +393,7 @@ public:
     }
 };
 
-/// Te folosesti de coada asta pentru a face animatii
+/// coada din care sunt preluate animatiile (pt functia animations())
 queue < pair < Node*, Vector2f> > requestForAnimation;
 
 class Buton : public Element
@@ -429,6 +441,8 @@ public:
         Elements.push_back(this);
         //ButonDictionar[_id] = this;
     }
+    
+    // metoda care se ocupa de procesarea textului dintr-un buton de input
     void handleTextInput(string input) {
         string str = text.getString();
         text.setString(input);
@@ -436,6 +450,8 @@ public:
             handleTextInput(str);
         updateTextPosition();
     }
+    
+    // metoda care returneaza textul dintr-un buton
     const string getText() const {
         return text.getString();
     }
@@ -451,6 +467,7 @@ public:
         text.setPosition(position);
     }
 
+    // metoda care seteaza textul in buton
     void setText(string str)
     {
         text.setString(str);
@@ -497,6 +514,7 @@ public:
         return rectangle.getGlobalBounds().contains(point);
     }
 
+    // functie care afiseaza elementul pe ecran
     void draw(RenderTarget& target, RenderStates states) const
     {
 
@@ -507,10 +525,14 @@ public:
             target.draw(text, states);
         }
     }
+
+    // returneaza pozitia
     Vector2f getPosition()
     {
         return { rectangle.getPosition().x,rectangle.getPosition().y };
     }
+
+    // seteaza pozitia
     void setPosition(Vector2f point)
     {
         rectangle.setPosition(point);
@@ -526,12 +548,14 @@ public:
 
     }
 
+    // face butonul vizibil / interactiv
     void makeVisible()
     {
         isDisplayed = true;
         isInteractive = true;
     }
 
+    // invers
     void makeInvisible()
     {
         isDisplayed = false;
@@ -540,7 +564,7 @@ public:
 
 };
 
-/// functie ce se ocupa de toate animatiile
+/* Stefan: functie care actualizeaza animatiile*/
 void animations()
 {
     struct animation
@@ -592,7 +616,8 @@ void animations()
 }
 
 float distanceBetweenTwoPoints(Vector2f point1, Vector2f point2);
-/// functie ce este apelata automat ce da refresh la ecran
+
+// Stefan: functie ce este apelata automat ce da refresh la ecran
 void updateScreen(RenderWindow* window)
 {
     Context context;
@@ -855,6 +880,11 @@ void updateScreen(RenderWindow* window)
     }
 
 }
+
+/*
+    Stefan, Vlad
+    clasa care implementeaza functiile butoanelor (animatii / back end)
+*/
 
 /// TODO: DE TERMINAT ASTA
 class DataStructureVisualizer {
@@ -1282,6 +1312,10 @@ void switchLanguage(string lang) {
     }
 }
 
+/*
+    Stefan, Vlad
+    functie care se ocupa de actiunile butoanelor
+*/
 void resolveCustomEvents()
 {
     string id, event;
@@ -1678,7 +1712,7 @@ void resolveCustomEvents()
 int main()
 {
     font.loadFromFile("./Fonts/Montserrat-Regular.ttf");
-    RenderWindow window(VideoMode(WIDTH_SCREEN, HEIGHT_SCREEN), "SFML works!", Style::Close, settings);
+    RenderWindow window(VideoMode(WIDTH_SCREEN, HEIGHT_SCREEN), "BibLis", Style::Close, settings);
     window.setActive(false);
     Thread updateScreenThread(&updateScreen, &window);
     Thread animationsThread(&animations);
@@ -1692,37 +1726,37 @@ int main()
     sound.play();*/
     words();
 
-    /// IN LOC SA CREEZ VARIABILE MAI BINE LE PUN IN DICTIONAR DIRECT
-    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, Language[limba]["sllBtn"], "sllBtn");
-    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, Language[limba]["dllBtn"], "dllBtn");
-    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, Language[limba]["stackBtn"], "stackBtn");
-    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, Language[limba]["queueBtn"], "queueBtn");
+    // Stefan: butoanele de selectie intre tipurile de date
+    ButonDictionar["sllBtn"] =new Buton({50,0}, {300,50}, Language[limba]["sllBtn"], "sllBtn");                                     // selecteaza sll
+    ButonDictionar["dllBtn"] = new Buton({ 400,0 }, { 300,50 }, Language[limba]["dllBtn"], "dllBtn");                               // selecteaza dll
+    ButonDictionar["stackBtn"] = new Buton({ 750,0 }, { 200,50 }, Language[limba]["stackBtn"], "stackBtn");                         // selecteaza stiva
+    ButonDictionar["queueBtn"] = new Buton({ 1000,0 }, { 200,50 }, Language[limba]["queueBtn"], "queueBtn");                        // selecteaza coada
 
-    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, Language[limba]["newListBtn"], "newListBtn");
-    //ButonDictionar["clearListBtn"] = new Buton({ 1200,700 }, { 290,50 }, "Clear List", "clearListBtn");
+    // Vlad: butoanele de prelucrare a elementelor listei
+    ButonDictionar["newListBtn"] = new Buton({ 1200,200 }, { 290,50 }, Language[limba]["newListBtn"], "newListBtn");                // lista noua
 
-    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["addNodeBtn"], "addNodeBtn");
-    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["pushNodeBtn"], "pushNodeBtn");
-    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, Language[limba]["pushFrontBtn"], "pushFrontBtn");
-    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, Language[limba]["pushBackBtn"], "pushBackBtn");
+    ButonDictionar["addNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["addNodeBtn"], "addNodeBtn");                // adauga nod
+    ButonDictionar["pushNodeBtn"] = new Buton({ 1200,400 }, { 140,50 }, Language[limba]["pushNodeBtn"], "pushNodeBtn");             // introduce nod in stiva / coada
+    ButonDictionar["pushFrontBtn"] = new Buton({ 1200,460 }, { 140,50 }, Language[limba]["pushFrontBtn"], "pushFrontBtn");          // adauga nod la inceputul listei
+    ButonDictionar["pushBackBtn"] = new Buton({ 1200,520 }, { 140,50 }, Language[limba]["pushBackBtn"], "pushBackBtn");             // adauga nod la finalul listei
    
-    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["delNodeBtn"], "delNodeBtn");
-    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["popNodeBtn"], "popNodeBtn");
-    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, Language[limba]["popFrontBtn"], "popFrontBtn");
-    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, Language[limba]["popBackBtn"], "popBackBtn");
+    ButonDictionar["delNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["delNodeBtn"], "delNodeBtn");                // sterge nod
+    ButonDictionar["popNodeBtn"] = new Buton({ 1350,400 }, { 140,50 }, Language[limba]["popNodeBtn"], "popNodeBtn");                // elimina nod din stiva / coada
+    ButonDictionar["popFrontBtn"] = new Buton({ 1350,460 }, { 140,50 }, Language[limba]["popFrontBtn"], "popFrontBtn");             // elimina nod de la inceputul listei
+    ButonDictionar["popBackBtn"] = new Buton({ 1350,520 }, { 140,50 }, Language[limba]["popBackBtn"], "popBackBtn");                // elimina nod de la finalul listei
     
     
     
-    ButonDictionar["saveLists"] = new Buton({ 1220,0 }, { 120,50 }, Language[limba]["saveLists"], "saveListsBtn");
-    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 120,50 }, Language[limba]["loadLists"], "loadListsBtn");
+    ButonDictionar["saveLists"] = new Buton({ 1220,0 }, { 120,50 }, Language[limba]["saveLists"], "saveListsBtn");                  // salveaza listele in fisier
+    ButonDictionar["loadLists"] = new Buton({ 1350,0 }, { 120,50 }, Language[limba]["loadLists"], "loadListsBtn");                  // incarca listele din fisier
 
-    ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, Language[limba]["ti_addNodePos"], "ti_addNodePos");
-    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, Language[limba]["ti_addNodeData"], "ti_addNodeData");
+    ButonDictionar["ti_addNodePos"] = new Buton({ 1200,300 }, { 140,50 }, Language[limba]["ti_addNodePos"], "ti_addNodePos");       // preia pozitia nodului care trebuie adaugat / sters
+    ButonDictionar["ti_addNodeData"] = new Buton({ 1350,300 }, { 140,50 }, Language[limba]["ti_addNodeData"], "ti_addNodeData");    // preia datele care trebuie introduse in nod
 
-    ButonDictionar["languageBtn"] = new Buton({ 1400,720 }, { 60,40 }, limba, "languageBtn");
+    ButonDictionar["languageBtn"] = new Buton({ 1400,720 }, { 60,40 }, limba, "languageBtn");                                       // schimba limba
 
-    ButonDictionar["slowUp"] = new Buton({ 50,720 }, { 120,40 }, Language[limba]["slowUp"], "slowUp");
-    ButonDictionar["speedUp"] = new Buton({ 190, 720 }, { 120,40 } , Language[limba]["speedUp"] , "speedUp");
+    ButonDictionar["slowUp"] = new Buton({ 50,720 }, { 120,40 }, Language[limba]["slowUp"], "slowUp");                              // scade viteza animatiilor
+    ButonDictionar["speedUp"] = new Buton({ 190, 720 }, { 120,40 } , Language[limba]["speedUp"] , "speedUp");                       // creste viteza animatiilor
 
 
 
@@ -1733,11 +1767,12 @@ int main()
     bool press = false;
     string ti_input;
     
+    // Stefan: detecteaza interactiunile cu mouse / tastatura
+
     while (window.isOpen())
     {
         /// aici rezolv logica interfetei
         resolveCustomEvents();
-        /// prin event se refera la interactiunea cu mouse ul , tastatura etc
         Event event;
         while (window.pollEvent(event))
         {
@@ -1799,6 +1834,8 @@ int main()
                     }
                 }
             }
+
+            // verifica textul introdus in caseta de text
             //if (target->type == "TextField") {
             if (target != nullptr && target->ti_focused == true) {
                 
